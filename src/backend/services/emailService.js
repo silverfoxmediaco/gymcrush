@@ -3,6 +3,10 @@
 // Purpose: Handle all email sending functionality
 
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
+
+// Initialize Resend if API key is provided
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Create reusable transporter
 const createTransporter = () => {
@@ -291,12 +295,128 @@ const emailTemplates = {
       
       © 2024 GymCrush - Where Strength Meets Chemistry
     `
+  }),
+
+  // NEW: Email verification template
+  emailVerification: (username, verificationUrl) => ({
+    subject: '💪 Verify Your GymCrush Email',
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body {
+              font-family: 'Poppins', 'Arial', sans-serif;
+              line-height: 1.6;
+              color: #0A0F3D;
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+              background-color: #F2F2F7;
+            }
+            .container {
+              background-color: #FFFFFF;
+              border-radius: 12px;
+              padding: 30px;
+              text-align: center;
+              box-shadow: 0 4px 12px rgba(10, 15, 61, 0.1);
+            }
+            .logo {
+              font-size: 48px;
+              margin-bottom: 20px;
+            }
+            h2 {
+              color: #FF3B30;
+              margin-bottom: 20px;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: -0.5px;
+            }
+            .button {
+              display: inline-block;
+              background: #FF3B30;
+              color: white;
+              padding: 14px 32px;
+              text-decoration: none;
+              border-radius: 12px;
+              font-weight: 600;
+              margin: 20px 0;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              transition: all 0.3s ease;
+            }
+            .button:hover {
+              background: #E5342A;
+              transform: scale(1.02);
+            }
+            .footer {
+              margin-top: 30px;
+              font-size: 14px;
+              color: #8E8E93;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="logo">💪🔥</div>
+            <h2>Hey ${username}!</h2>
+            <p style="font-size: 16px;">One quick step before you start crushing it!</p>
+            <p>Please verify your email address to activate your GymCrush account:</p>
+            
+            <a href="${verificationUrl}" class="button">Verify My Email</a>
+            
+            <p style="margin-top: 20px; font-size: 14px;">
+              Or copy and paste this link into your browser:<br>
+              <span style="color: #FF3B30; word-break: break-all;">${verificationUrl}</span>
+            </p>
+            
+            <div class="footer">
+              <p>If you didn't create a GymCrush account, you can safely ignore this email.</p>
+              <hr style="border: none; border-top: 1px solid #F2F2F7; margin: 20px 0;">
+              <p><strong>Let's get those gains! 💪</strong></p>
+              <p>© 2024 GymCrush - Where Strength Meets Chemistry</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+      Hey ${username}!
+      
+      One quick step before you start crushing it!
+      
+      Please verify your email address to activate your GymCrush account:
+      ${verificationUrl}
+      
+      If you didn't create a GymCrush account, you can safely ignore this email.
+      
+      Let's get those gains!
+      
+      © 2024 GymCrush - Where Strength Meets Chemistry
+    `
   })
 };
 
-// Main email sending function
+// Main email sending function with Resend support
 const sendEmail = async (options) => {
   try {
+    // Use Resend if available and configured
+    if (process.env.EMAIL_SERVICE === 'resend' && resend) {
+      const { data, error } = await resend.emails.send({
+        from: process.env.EMAIL_FROM || 'GymCrush <onboarding@resend.dev>',
+        to: options.to,
+        subject: options.subject,
+        html: options.html,
+        text: options.text,
+      });
+      
+      if (error) throw error;
+      
+      console.log('Email sent successfully via Resend:', data.id);
+      return { success: true, messageId: data.id };
+    }
+    
+    // Fallback to nodemailer for other services
     const transporter = createTransporter();
     
     // Verify transporter configuration
@@ -339,9 +459,19 @@ const sendWelcomeEmail = async (email, username) => {
   });
 };
 
-// THIS IS THE CRUCIAL PART YOU'RE MISSING!
+// NEW: Send email verification
+const sendVerificationEmail = async (email, username, verificationUrl) => {
+  const template = emailTemplates.emailVerification(username, verificationUrl);
+  return await sendEmail({
+    to: email,
+    ...template
+  });
+};
+
+// Export all functions
 module.exports = {
   sendEmail,
   sendPasswordResetEmail,
-  sendWelcomeEmail
+  sendWelcomeEmail,
+  sendVerificationEmail
 };
