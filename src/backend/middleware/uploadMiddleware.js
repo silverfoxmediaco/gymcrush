@@ -15,7 +15,7 @@ const storage = new CloudinaryStorage({
     const userId = req.userId || 'anonymous';
     
     return {
-      folder: 'wallflower-messages', // Separate folder for message images
+      folder: 'gymcrush-messages', // Updated folder name for GymCrush
       allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
       transformation: [
         { width: 1200, height: 1200, crop: 'limit', quality: 'auto' }
