@@ -247,12 +247,12 @@
   font-size: 0.95rem;
 }
 
-.btn-secondary {
+.btn-change-password {
   background: linear-gradient(135deg, var(--color-deep-blue), #1a2354);
-  color: white;
+  color: white !important;
 }
 
-.btn-secondary:hover {
+.btn-change-password {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(10, 15, 61, 0.4);
 }

@@ -35,7 +35,7 @@ const Settings = () => {
             <h2>Account Settings</h2>
             <div className="account-actions">
               <button 
-                className="btn btn-secondary"
+                className="btn-change-password"
                 onClick={() => navigate('/reset-password')}
               >
                 Change Password
