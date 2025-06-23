@@ -164,8 +164,8 @@ const userSchema = new mongoose.Schema({
     },
     tier: {
       type: String,
-      enum: ['basic', 'premium', 'elite'],
-      default: null
+      enum: ['free', 'basic', 'premium', 'elite'],
+      default: 'free'
     },
     currentPeriodEnd: Date,
     cancelAtPeriodEnd: {
