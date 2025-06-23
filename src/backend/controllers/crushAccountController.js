@@ -70,8 +70,11 @@ exports.createSubscription = [verifyToken, async (req, res) => {
          price_data: {
            currency: 'usd',
            product_data: {
-             name: 'GymCrush Unlimited',
-             description: 'Unlimited crushes every month. Send as many connections as you want!'
+             name: 'Unlimited Membership',
+             description: 'Unlimited crushes every month.',
+             metadata: {
+               stripeProductId: 'prod_SYP2rzDQ9RMS1c'
+             }
            },
            unit_amount: 2999, // $29.99
            recurring: {
@@ -86,7 +89,8 @@ exports.createSubscription = [verifyToken, async (req, res) => {
      cancel_url: `${process.env.CLIENT_URL}/profile?subscription=cancelled`,
      metadata: {
        userId: req.userId,
-       type: 'unlimited'
+       type: 'unlimited',
+       stripeProductId: 'prod_SYP2rzDQ9RMS1c'
      }
    });
    
@@ -247,10 +251,34 @@ exports.createCheckoutSession = [verifyToken, async (req, res) => {
    
    // Validate package
    const validPackages = {
-     warmup: { crushes: 5, price: 499 },
-     workout: { crushes: 15, price: 999 },
-     training: { crushes: 30, price: 1499 },
-     athlete: { crushes: 60, price: 2499 }
+     starter: { 
+       crushes: 5, 
+       price: 499,  // $4.99
+       stripeProductId: 'prod_SYP4Y5Q1yJaXmg',
+       name: 'Starter Pack',
+       description: '5 crushes perfect for testing your skillset.'
+     },
+     power: { 
+       crushes: 15, 
+       price: 999,  // $9.99
+       stripeProductId: 'prod_SYP4RQaXWifAek',
+       name: 'Power Pack',
+       description: '15 crushes Most popular choice.'
+     },
+     athlete: { 
+       crushes: 30, 
+       price: 1499,  // $14.99
+       stripeProductId: 'prod_SYP5cwrymqYSPt',
+       name: 'Athlete Bundle',
+       description: '30 Crushes best value for active daters.'
+     },
+     champion: { 
+       crushes: 60, 
+       price: 2499,  // $24.99
+       stripeProductId: 'prod_SYP6NwJdoTrAOI',
+       name: 'Champion Bundle',
+       description: '60 Crushes - You are just wanting to have fun.'
+     }
    };
    
    if (!validPackages[packageId]) {
@@ -270,26 +298,6 @@ exports.createCheckoutSession = [verifyToken, async (req, res) => {
      });
    }
    
-   // Package names and descriptions
-   const packageInfo = {
-     warmup: {
-       name: 'Warmup Pack',
-       description: 'Perfect for getting started on GymCrush'
-     },
-     workout: {
-       name: 'Workout Bundle',
-       description: 'Most popular choice for active daters'
-     },
-     training: {
-       name: 'Training Pack',
-       description: 'Best value for regular users'
-     },
-     athlete: {
-       name: 'Athlete Bundle',
-       description: 'For the serious fitness dating enthusiast'
-     }
-   };
-   
    // Create Stripe checkout session with price_data
    const session = await stripe.checkout.sessions.create({
      payment_method_types: ['card'],
@@ -298,9 +306,12 @@ exports.createCheckoutSession = [verifyToken, async (req, res) => {
          price_data: {
            currency: 'usd',
            product_data: {
-             name: `${packageInfo[packageId].name} - ${crushes} Crushes`,
-             description: packageInfo[packageId].description,
-             images: ['https://www.gymcrush.io/crush-icon.png'] // Update with your icon URL
+             name: selectedPackage.name,
+             description: selectedPackage.description,
+             images: ['https://www.gymcrush.io/crush-icon.png'], // Update with your icon URL
+             metadata: {
+               stripeProductId: selectedPackage.stripeProductId
+             }
            },
            unit_amount: selectedPackage.price, // Price in cents
          },
@@ -313,7 +324,8 @@ exports.createCheckoutSession = [verifyToken, async (req, res) => {
      metadata: {
        userId: req.userId,
        packageId: packageId,
-       crushes: crushes.toString()
+       crushes: crushes.toString(),
+       stripeProductId: selectedPackage.stripeProductId
      }
    });
    
@@ -364,6 +376,7 @@ exports.handleStripeWebhook = async (req, res) => {
              stripeSubscriptionId: subscription.id,
              stripeCustomerId: subscription.customer,
              status: subscription.status,
+             tier: 'unlimited',
              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
              cancelAtPeriodEnd: subscription.cancel_at_period_end
            }
@@ -630,7 +643,8 @@ function getFeaturesByTier(tier) {
  const features = {
    basic: ['15 crushes per day', 'Basic filters', 'See who liked you'],
    premium: ['50 crushes per day', 'Advanced filters', 'Send images', 'Priority visibility'],
-   elite: ['Unlimited crushes', 'All features', 'Profile boost', 'Exclusive badges']
+   elite: ['Unlimited crushes', 'All features', 'Profile boost', 'Exclusive badges'],
+   unlimited: ['Unlimited crushes', 'All features', 'Profile boost', 'Priority matching']
  };
  
  return features[tier] || [];

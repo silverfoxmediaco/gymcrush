@@ -231,7 +231,7 @@ const FilterSettings = ({ onSave, initialFilters = {} }) => {
       {/* Action Buttons */}
       <div className="filter-actions">
         <button 
-          className="btn-secondary"
+          className="preferencesbtn"
           onClick={handleResetFilters}
         >
           Reset to Defaults
