@@ -9,13 +9,22 @@ import './MeetSomeMembers.css';
 const MeetSomeMembers = ({ onSignupClick }) => {
   const navigate = useNavigate();
   
-  // Real data from API
+  // Manual stats configuration
+  const MANUAL_STATS = {
+    total: 2847,
+    newThisWeek: 124,
+    successStories: 186,
+    activeMembers: 1892
+  };
+  
+  // Initialize with 0 for animation
   const [memberStats, setMemberStats] = useState({
-    total: '...',
-    newThisWeek: '...',
-    successStories: '...',
-    activeMembers: '...'
+    total: 0,
+    newThisWeek: 0,
+    successStories: 0,
+    activeMembers: 0
   });
+  
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,17 +45,41 @@ const MeetSomeMembers = ({ onSignupClick }) => {
   };
 
   useEffect(() => {
-    // Fetch real member statistics
-    fetch('/api/stats/members')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setMemberStats(data.stats);
+    // Animate the stats numbers
+    const animateStats = () => {
+      const duration = 2000; // 2 seconds
+      const steps = 60;
+      const interval = duration / steps;
+      let currentStep = 0;
+
+      const timer = setInterval(() => {
+        currentStep++;
+        const progress = currentStep / steps;
+        
+        // Easing function for smooth animation
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+        
+        setMemberStats({
+          total: Math.floor(MANUAL_STATS.total * easeOutQuart),
+          newThisWeek: Math.floor(MANUAL_STATS.newThisWeek * easeOutQuart),
+          successStories: Math.floor(MANUAL_STATS.successStories * easeOutQuart),
+          activeMembers: Math.floor(MANUAL_STATS.activeMembers * easeOutQuart)
+        });
+
+        if (currentStep >= steps) {
+          clearInterval(timer);
+          setMemberStats(MANUAL_STATS); // Ensure exact final values
+          setLoading(false); // Remove loading state after animation
         }
-      })
-      .catch(err => {
-        console.error('Failed to fetch member stats:', err);
-      });
+      }, interval);
+
+      return () => clearInterval(timer);
+    };
+
+    // Start animation after a short delay
+    const animationTimeout = setTimeout(() => {
+      animateStats();
+    }, 300);
 
     // Fetch actual member profiles
     fetch('/api/members/featured')
@@ -57,12 +90,12 @@ const MeetSomeMembers = ({ onSignupClick }) => {
           const shuffledMembers = [...data.members].sort(() => Math.random() - 0.5);
           setMembers(shuffledMembers);
         }
-        setLoading(false);
       })
       .catch(err => {
         console.error('Failed to fetch members:', err);
-        setLoading(false);
       });
+
+    return () => clearTimeout(animationTimeout);
   }, []);
 
   return (
@@ -79,25 +112,25 @@ const MeetSomeMembers = ({ onSignupClick }) => {
         <div className="member-stats">
           <div className="stat-card">
             <div className={`stat-number ${loading ? 'loading' : ''}`}>
-              {memberStats.total}
+              {memberStats.total.toLocaleString()}
             </div>
             <div className="stat-label">Gym Crushers</div>
           </div>
           <div className="stat-card">
             <div className={`stat-number ${loading ? 'loading' : ''}`}>
-              {memberStats.newThisWeek}
+              {memberStats.newThisWeek.toLocaleString()}
             </div>
             <div className="stat-label">New This Week</div>
           </div>
           <div className="stat-card">
             <div className={`stat-number ${loading ? 'loading' : ''}`}>
-              {memberStats.successStories}
+              {memberStats.successStories.toLocaleString()}
             </div>
             <div className="stat-label">Success Stories</div>
           </div>
           <div className="stat-card">
             <div className={`stat-number ${loading ? 'loading' : ''}`}>
-              {memberStats.activeMembers}
+              {memberStats.activeMembers.toLocaleString()}
             </div>
             <div className="stat-label">Active Members</div>
           </div>
@@ -131,30 +164,6 @@ const MeetSomeMembers = ({ onSignupClick }) => {
                     <p className="member-location">
                       {member.profile?.location || 'Location not set'}
                     </p>
-                    {/* {member.profile?.personalityType && (
-                      <span className="personality-badge">
-                        {member.profile.personalityType}
-                      </span>
-                    )}
-                    <p className="member-bio">
-                      {member.profile?.bio ? 
-                        (member.profile.bio.length > 100 ? 
-                          member.profile.bio.substring(0, 100) + '...' : 
-                          member.profile.bio
-                        ) : 
-                        'No bio yet'
-                      }
-                    </p>
-                    {member.profile?.interests && member.profile.interests.length > 0 && (
-                      <div className="member-interests">
-                        {member.profile.interests.slice(0, 3).map((interest, idx) => (
-                          <span key={idx} className="interest-tag">{interest}</span>
-                        ))}
-                        {member.profile.interests.length > 3 && (
-                          <span className="more-interests">+{member.profile.interests.length - 3}</span>
-                        )}
-                      </div>
-                    )} */}
                     <button className="view-profile-btn" onClick={() => handleViewProfile(member._id)}>
                       View Profile
                     </button>

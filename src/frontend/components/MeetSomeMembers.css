@@ -42,36 +42,63 @@
   .stat-card {
     text-align: center;
     padding: var(--space-xl) var(--space-lg);
-    background: white;
+    background: var(--color-deep-blue);
     border-radius: var(--radius-md);
-    box-shadow: 0 4px 16px rgba(255, 59, 48, 0.06);
+    box-shadow: 0 4px 16px rgba(10, 15, 61, 0.3);
     transition: all 0.3s ease;
     border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(50, 255, 106, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+  }
+  
+  .stat-card:hover::before {
+    animation: shine 0.5s ease;
+    opacity: 1;
+  }
+  
+  @keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
   }
   
   .stat-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(255, 59, 48, 0.15);
+    box-shadow: 0 8px 24px rgba(10, 15, 61, 0.5);
     border-color: var(--color-accent-green);
   }
   
   .stat-number {
     font-size: 2.5rem;
     font-weight: 700;
-    color: red;
-    background: linear-gradient(135deg, var(--color-primary-red), var(--color-alert-pink));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--color-accent-green);
     margin-bottom: var(--space-sm);
+    text-shadow: 0 0 20px rgba(50, 255, 106, 0.5);
+    position: relative;
+    z-index: 1;
   }
   
   .stat-label {
     font-size: 1rem;
-    color: var(--color-text-muted);
+    color: white;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
   }
   
   /* Featured Members Section */
@@ -410,7 +437,6 @@
     
     .stat-number {
       font-size: 2rem;
-      color: red;
     }
     
     .testimonials-grid {
@@ -449,10 +475,10 @@
   
   @keyframes pulse {
     0%, 100% {
-      opacity: 0.6;
+      opacity: 0.3;
     }
     50% {
-      opacity: 1;
+      opacity: 0.6;
     }
   }
   
