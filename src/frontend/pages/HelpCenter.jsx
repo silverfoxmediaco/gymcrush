@@ -19,43 +19,43 @@ const HelpCenter = () => {
     {
       id: 'getting-started',
       name: 'Getting Started',
-      icon: '🌱',
-      color: '#B0C5A4',
-      description: 'Everything you need to begin your journey'
+      icon: '💪',
+      color: '#32FF6A',
+      description: 'Everything you need to start crushing it'
     },
     {
-      id: 'your-garden',
-      name: 'Your Garden',
-      icon: '🌸',
-      color: '#E0AED0',
-      description: 'Learn about seeds, matches, and connections'
+      id: 'your-gym',
+      name: 'Your Gym',
+      icon: '🔥',
+      color: '#FF3B30',
+      description: 'Learn about crushes, matches, and connections'
     },
     {
       id: 'messages',
       name: 'Messages & Chat',
       icon: '💬',
-      color: '#937DC2',
+      color: '#0A0F3D',
       description: 'Communicate with your matches'
     },
     {
       id: 'profile',
       name: 'Profile & Photos',
       icon: '📸',
-      color: '#E0AED0',
-      description: 'Make your profile shine'
+      color: '#FF2D95',
+      description: 'Make your profile stand out'
     },
     {
       id: 'safety',
       name: 'Safety & Privacy',
       icon: '🛡️',
-      color: '#937DC2',
+      color: '#0A0F3D',
       description: 'Stay safe while dating'
     },
     {
       id: 'account',
       name: 'Account & Billing',
       icon: '⚙️',
-      color: '#B0C5A4',
+      color: '#32FF6A',
       description: 'Manage your account and subscriptions'
     }
   ];
@@ -66,70 +66,70 @@ const HelpCenter = () => {
     {
       id: 'create-account',
       categoryId: 'getting-started',
-      title: 'Creating Your Wallflower Account',
-      description: 'Step-by-step guide to joining our community',
+      title: 'Creating Your GymCrush Account',
+      description: 'Step-by-step guide to joining our fitness community',
       readTime: '3 min',
       steps: [
         {
-          title: 'Download and Open Wallflower',
-          content: 'Start by downloading Wallflower from the App Store or visiting our website.',
+          title: 'Download and Open GymCrush',
+          content: 'Start by downloading GymCrush from the App Store or visiting our website.',
           screenshot: '/src/assets/IMG_4369.png'
         },
         {
           title: 'Sign Up with Email',
-          content: 'Tap "Start Your Garden" and enter your email address.',
+          content: 'Tap "Start Crushing It" and enter your email address.',
           screenshot: 'src/frontend/assets/IMG_4355-portrait.png'
         },
         {
           title: 'Create Your Profile',
-          content: 'Add your name, birthday, and a bit about yourself.',
+          content: 'Add your name, birthday, fitness goals, and workout preferences.',
           screenshot: 'src/frontend/assets/IMG_4348-portrait.png'
         }
       ]
     },
     {
-      id: 'understanding-seeds',
+      id: 'understanding-crushes',
       categoryId: 'getting-started',
-      title: 'What Are Seeds?',
+      title: 'What Are Crushes?',
       description: 'Learn about our unique way of showing interest',
       readTime: '2 min',
-      content: `Seeds are Wallflower's gentle way of expressing interest. When you send someone a seed, you're saying "I'd like to get to know you" without any pressure. You start with 5 free seeds!`,
+      content: `Crushes are GymCrush's bold way of expressing interest. When you send someone a crush, you're saying "Let's workout together" or "I'm interested!" You start with 5 free crushes!`,
       screenshot: 'src/frontend/assets/IMG_4349-portrait.png'
     },
     
-    // Your Garden
+    // Your Gym
     {
-      id: 'sending-seeds',
-      categoryId: 'your-garden',
-      title: 'How to Send a Seed',
-      description: 'Show interest in someone special',
+      id: 'sending-crushes',
+      categoryId: 'your-gym',
+      title: 'How to Send a Crush',
+      description: 'Show interest in your gym match',
       readTime: '2 min',
       steps: [
         {
           title: 'Browse Profiles',
-          content: 'Swipe through profiles in the Garden view.',
+          content: 'Swipe through profiles in the Gym view.',
           screenshot: 'src/frontend/assets/IMG_4347-portrait.png'
         },
         {
-          title: 'Find Someone Interesting',
-          content: 'When you find someone you like, tap their profile for more details.',
+          title: 'Find Your Match',
+          content: 'When you find someone with similar fitness goals, tap their profile for more details.',
           screenshot: '/src/assets/IMG_4367.png'
         },
         {
-          title: 'Send a Seed',
-          content: 'Tap the seed button at the bottom of their profile. That\'s it!',
+          title: 'Send a Crush',
+          content: 'Tap the fire button at the bottom of their profile. Time to crush it!',
           screenshot: '/src/assets/IMG_4386.png',
           highlight: { x: 195, y: 600, width: 80, height: 80 }
         }
       ]
     },
     {
-      id: 'mutual-seeds',
-      categoryId: 'your-garden',
-      title: 'When Seeds Match',
-      description: 'What happens when interest is mutual',
+      id: 'mutual-crushes',
+      categoryId: 'your-gym',
+      title: 'When Crushes Match',
+      description: 'What happens when the chemistry is mutual',
       readTime: '2 min',
-      content: 'When you and another person have sent each other seeds, it\'s a match! You\'ll both be notified and can start chatting.',
+      content: 'When you and another person have sent each other crushes, it\'s a match! You\'ll both be notified and can start planning your first workout date.',
       screenshot: '/src/assets/IMG_4372.png'
     },
     
@@ -141,10 +141,10 @@ const HelpCenter = () => {
       description: 'Break the ice with confidence',
       readTime: '3 min',
       tips: [
-        'Reference something from their profile',
-        'Ask an open-ended question',
-        'Be genuine and authentic',
-        'Keep it light and friendly'
+        'Ask about their fitness goals or favorite workouts',
+        'Suggest a gym session or active date',
+        'Share your PR (personal record) achievements',
+        'Keep it energetic and motivating'
       ],
       screenshot: '/src/assets/IMG_4356.png'
     },
@@ -155,9 +155,9 @@ const HelpCenter = () => {
       description: 'Photos, voice notes, and more',
       readTime: '2 min',
       features: [
-        { icon: '📷', title: 'Send Photos', desc: 'Share moments (costs 1 seed)' },
+        { icon: '📷', title: 'Send Photos', desc: 'Share gym selfies (costs 1 crush)' },
         { icon: '🎤', title: 'Voice Notes', desc: 'Add a personal touch' },
-        { icon: '😊', title: 'Reactions', desc: 'React to messages with emojis' }
+        { icon: '💪', title: 'Reactions', desc: 'React to messages with emojis' }
       ],
       screenshot: '/src/assets/IMG_4370.png'
     },
@@ -166,23 +166,23 @@ const HelpCenter = () => {
     {
       id: 'perfect-profile',
       categoryId: 'profile',
-      title: 'Creating the Perfect Profile',
-      description: 'Stand out while being authentic',
+      title: 'Creating the Perfect Fitness Profile',
+      description: 'Stand out in the gym crowd',
       readTime: '5 min',
       sections: [
         {
-          title: 'Choose Great Photos',
-          content: 'Use recent photos that show your genuine smile. Include a mix of close-ups and full body shots.',
+          title: 'Choose Action Shots',
+          content: 'Use recent photos that show your fitness journey. Include gym pics, outdoor activities, and post-workout smiles.',
           screenshot: '/src/assets/IMG_4379.png'
         },
         {
-          title: 'Write a Compelling Bio',
-          content: 'Share your interests, what makes you unique, and what you\'re looking for.',
+          title: 'Write a Motivating Bio',
+          content: 'Share your fitness goals, favorite workouts, and what kind of gym partner you\'re looking for.',
           screenshot: '/src/assets/IMG_4378.png'
         },
         {
-          title: 'Add Your Interests',
-          content: 'Select interests that truly represent you. This helps find compatible matches.',
+          title: 'Add Your Fitness Interests',
+          content: 'Select activities you love: weightlifting, yoga, running, CrossFit, etc.',
           screenshot: '/src/assets/IMG_4382.png'
         }
       ]
@@ -193,13 +193,13 @@ const HelpCenter = () => {
       id: 'stay-safe',
       categoryId: 'safety',
       title: 'Dating Safety Tips',
-      description: 'Essential guidelines for safe dating',
+      description: 'Essential guidelines for safe fitness dating',
       readTime: '4 min',
       safetyTips: [
-        'Meet in public places for first dates',
-        'Tell a friend about your plans',
+        'Meet at public gyms or fitness venues first',
+        'Tell a friend about your workout date plans',
         'Trust your instincts',
-        'Video chat before meeting',
+        'Video chat before meeting in person',
         'Never send money to matches'
       ]
     },
@@ -227,12 +227,12 @@ const HelpCenter = () => {
     {
       id: 'subscription-benefits',
       categoryId: 'account',
-      title: 'Subscription Benefits',
-      description: 'Get unlimited seeds and more',
+      title: 'GymCrush Premium Benefits',
+      description: 'Get unlimited crushes and more',
       readTime: '3 min',
       benefits: [
-        { icon: '∞', title: 'Unlimited Seeds', desc: 'Never run out of ways to connect' },
-        { icon: '👀', title: 'See Who Likes You', desc: 'Know who sent you seeds' },
+        { icon: '∞', title: 'Unlimited Crushes', desc: 'Never run out of ways to connect' },
+        { icon: '👀', title: 'See Who Likes You', desc: 'Know who sent you crushes' },
         { icon: '🔄', title: 'Unlimited Rewinds', desc: 'Go back to profiles you passed' },
         { icon: '🌟', title: 'Priority Support', desc: 'Get help faster' }
       ],
@@ -241,7 +241,7 @@ const HelpCenter = () => {
   ];
 
   // Popular/trending articles
-  const popularArticles = ['sending-seeds', 'perfect-profile', 'start-conversation', 'understanding-seeds'];
+  const popularArticles = ['sending-crushes', 'perfect-profile', 'start-conversation', 'understanding-crushes'];
 
   // Filter articles based on search and category
   const filteredArticles = articles.filter(article => {
@@ -457,8 +457,8 @@ const HelpCenter = () => {
         <>
           {/* Hero Section */}
           <div className="help-hero">
-            <h1>How can we help you bloom? 🌸</h1>
-            <p>Find answers and learn how to make the most of Wallflower</p>
+            <h1>How can we help you crush it? 💪</h1>
+            <p>Find answers and learn how to make the most of GymCrush</p>
             
             <div className="search-container">
               <input
@@ -558,7 +558,7 @@ const HelpCenter = () => {
           {/* Contact Support */}
           <div className="contact-support">
             <h2>Still need help?</h2>
-            <p>Our support team is here to help you bloom</p>
+            <p>Our support team is here to help you reach your goals</p>
             <button 
               className="contact-button"
               onClick={() => navigate('/contact')}

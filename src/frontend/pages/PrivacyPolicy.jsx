@@ -1,6 +1,6 @@
 // Privacy Policy Page
 // Path: src/frontend/pages/PrivacyPolicy.jsx
-// Purpose: Display privacy policy for Wallflower.me
+// Purpose: Display privacy policy for GymCrush.io
 
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -27,7 +27,7 @@ const PrivacyPolicy = () => {
 
         <div className="privacy-body">
           <p className="privacy-intro">
-            Wallflower.me ("Wallflower", "we", "our", or "us") respects your privacy. 
+            GymCrush.io ("GymCrush", "we", "our", or "us") respects your privacy. 
             This Privacy Policy explains how we collect, use, and protect your information 
             when you use our website, app, or services (collectively, the "Service").
           </p>
@@ -38,9 +38,10 @@ const PrivacyPolicy = () => {
             <div className="privacy-subsection">
               <h3 className="privacy-subsection-title">a. Information You Provide</h3>
               <ul className="privacy-list">
-                <li>Name, email, date of birth, gender, preferences, and profile information.</li>
-                <li>Messages, photos, or other content you submit.</li>
-                <li>Payment information (if using paid features).</li>
+                <li>Name, email, date of birth, gender, fitness preferences, and profile information.</li>
+                <li>Messages, photos, workout data, or other content you submit.</li>
+                <li>Payment information (if using premium features).</li>
+                <li>Fitness goals, workout preferences, and gym locations.</li>
               </ul>
             </div>
 
@@ -49,7 +50,7 @@ const PrivacyPolicy = () => {
               <ul className="privacy-list">
                 <li>IP address, device type, browser information.</li>
                 <li>Usage data such as page visits and interactions.</li>
-                <li>Location (if enabled).</li>
+                <li>Location (if enabled for finding nearby gym partners).</li>
               </ul>
             </div>
 
@@ -67,9 +68,9 @@ const PrivacyPolicy = () => {
             <p className="privacy-text">We use your information to:</p>
             <ul className="privacy-list">
               <li>Create and manage your account.</li>
-              <li>Match you with compatible users.</li>
-              <li>Personalize your experience.</li>
-              <li>Communicate updates, offers, or support messages.</li>
+              <li>Match you with compatible fitness partners.</li>
+              <li>Personalize your fitness dating experience.</li>
+              <li>Communicate updates, workout tips, or support messages.</li>
               <li>Improve our Service and develop new features.</li>
               <li>Comply with legal obligations.</li>
             </ul>
@@ -109,8 +110,8 @@ const PrivacyPolicy = () => {
             </ul>
             <p className="privacy-text">
               To exercise any of these rights, contact us at:{' '}
-              <a href="mailto:privacy@wallflower.me" className="privacy-link">
-                privacy@wallflower.me
+              <a href="mailto:privacy@gymcrush.io" className="privacy-link">
+                privacy@gymcrush.io
               </a>
             </p>
           </section>
@@ -118,7 +119,7 @@ const PrivacyPolicy = () => {
           <section className="privacy-section">
             <h2 className="privacy-section-title">6. Children's Privacy</h2>
             <p className="privacy-text">
-              Wallflower is not intended for users under the age of 18. 
+              GymCrush is not intended for users under the age of 18. 
               We do not knowingly collect data from minors.
             </p>
           </section>
@@ -154,7 +155,7 @@ const PrivacyPolicy = () => {
               For any questions or privacy concerns, please contact:
             </p>
             <p className="privacy-contact">
-              <a href="mailto:privacy@wallflower.me">privacy@wallflower.me</a>
+              <a href="mailto:privacy@gymcrush.io">privacy@gymcrush.io</a>
             </p>
           </section>
         </div>

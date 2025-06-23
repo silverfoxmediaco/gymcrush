@@ -1,6 +1,6 @@
 // Safety Tips Page
 // Path: src/frontend/pages/SafetyTips.jsx
-// Purpose: Display safety tips for Wallflower.me users
+// Purpose: Display safety tips for GymCrush.io users
 
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -21,15 +21,16 @@ const SafetyTips = () => {
     <div className="safety-page">
       <div className="safety-container">
         <div className="safety-header">
-          <h1 className="safety-title">Wallflower.me Safety Tips</h1>
+          <h1 className="safety-title">GymCrush Safety Tips</h1>
           <p className="safety-effective-date">Effective Date: {currentDate}</p>
         </div>
 
         <div className="safety-body">
           <p className="safety-intro">
-            At Wallflower, we're committed to helping you build real, lasting connections — 
-            gently and safely. While we work hard to keep this community secure, your safety 
-            is always in your hands. Please take a moment to review these important tips:
+            At GymCrush, we're committed to helping you build real connections with fellow 
+            fitness enthusiasts — safely and confidently. While we work hard to keep this 
+            community secure, your safety is always in your hands. Please take a moment to 
+            review these important tips:
           </p>
 
           <section className="safety-tip">
@@ -59,8 +60,8 @@ const SafetyTips = () => {
                 Move at your own pace. There's no pressure to meet up or respond quickly.
               </li>
               <li>
-                Real connections take time to grow. Don't feel rushed into conversations 
-                or decisions.
+                Real connections take time to develop. Don't feel rushed into workouts 
+                or dates.
               </li>
             </ul>
           </section>
@@ -72,7 +73,7 @@ const SafetyTips = () => {
             </div>
             <ul className="tip-list">
               <li>
-                Keep chats within Wallflower until you're comfortable. This helps us better 
+                Keep chats within GymCrush until you're comfortable. This helps us better 
                 protect you and address any safety concerns.
               </li>
               <li>
@@ -89,9 +90,10 @@ const SafetyTips = () => {
             </div>
             <p className="tip-text">Watch for signs like:</p>
             <ul className="tip-list">
-              <li>Inconsistent stories or evasiveness</li>
-              <li>Requests for money or gifts</li>
+              <li>Inconsistent stories about their fitness journey or lifestyle</li>
+              <li>Requests for money, supplements, or expensive gym memberships</li>
               <li>Attempts to guilt, manipulate, or pressure you</li>
+              <li>Offering unsolicited training services or nutrition advice</li>
             </ul>
             <p className="tip-emphasis">If something feels off, it probably is. Trust your gut.</p>
           </section>
@@ -103,9 +105,10 @@ const SafetyTips = () => {
             </div>
             <p className="tip-text">If and when you decide to meet:</p>
             <ul className="tip-list">
-              <li>Choose a public place for your first few meetups.</li>
+              <li>Choose a public gym or fitness venue for your first few meetups.</li>
               <li>Let a friend or family member know where you're going and who you're meeting.</li>
               <li>Arrange your own transportation so you can leave at any time.</li>
+              <li>Consider starting with a daytime workout or coffee date.</li>
             </ul>
           </section>
 
@@ -115,15 +118,15 @@ const SafetyTips = () => {
               <h2 className="tip-title">Report Suspicious Behavior</h2>
             </div>
             <p className="tip-text">
-              We rely on our community to help keep Wallflower safe. If you see something 
+              We rely on our community to help keep GymCrush safe. If you see something 
               inappropriate, harmful, or suspicious:
             </p>
             <ul className="tip-list">
               <li>Use the in-app <strong>report</strong> feature</li>
               <li>
                 Or email our team at{' '}
-                <a href="mailto:safety@wallflower.me" className="safety-email">
-                  safety@wallflower.me
+                <a href="mailto:safety@gymcrush.io" className="safety-email">
+                  safety@gymcrush.io
                 </a>
               </li>
             </ul>
@@ -132,13 +135,13 @@ const SafetyTips = () => {
           <div className="safety-reminder">
             <p className="reminder-text">
               <strong>Remember:</strong> A healthy connection respects your comfort level, 
-              your pace, and your boundaries.
+              your pace, and your fitness boundaries.
             </p>
           </div>
 
           <div className="safety-closing">
             <p className="closing-quote">
-              <strong>Safety grows from self-awareness and mutual respect.</strong>
+              <strong>Stay strong, stay safe, keep crushing it!</strong>
             </p>
           </div>
         </div>

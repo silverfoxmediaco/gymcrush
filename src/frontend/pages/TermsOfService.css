@@ -18,7 +18,7 @@
     text-align: center;
     margin-bottom: calc(var(--space-xl) * 1.5);
     padding-bottom: var(--space-xl);
-    border-bottom: 2px solid rgba(147, 125, 194, 0.1);
+    border-bottom: 3px solid var(--color-accent-2);
   }
   
   .terms-title {
@@ -27,20 +27,32 @@
     color: var(--color-primary);
     margin-bottom: var(--space-md);
     font-family: var(--font-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
   
   .terms-effective-date {
     color: var(--color-text-muted);
     font-size: 1.125rem;
-    font-weight: 400;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
   
   .terms-body {
     background: white;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     padding: calc(var(--space-xl) * 1.5);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 16px rgba(255, 59, 48, 0.08);
     margin-bottom: var(--space-xl);
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+  }
+  
+  .terms-body:hover {
+    border-color: rgba(50, 255, 106, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 59, 48, 0.12);
   }
   
   .terms-intro {
@@ -49,16 +61,27 @@
     color: var(--color-text-primary);
     margin-bottom: calc(var(--space-xl) * 1.5);
     padding-bottom: var(--space-lg);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--color-neutral);
+    font-weight: 500;
   }
   
   .terms-intro strong {
     color: var(--color-primary);
-    font-weight: 600;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
   }
   
   .terms-section {
     margin-bottom: calc(var(--space-xl) * 1.5);
+    padding-left: 0;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+  }
+  
+  .terms-section:hover {
+    padding-left: var(--space-md);
+    border-left-color: var(--color-accent-2);
   }
   
   .terms-section:last-child {
@@ -67,10 +90,12 @@
   
   .terms-section-title {
     font-size: 1.75rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--color-primary);
     margin-bottom: var(--space-lg);
     font-family: var(--font-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
   
   .terms-text {
@@ -78,7 +103,7 @@
     line-height: 1.7;
     color: var(--color-text-primary);
     margin-bottom: var(--space-md);
-    font-weight: 400;
+    font-weight: 500;
   }
   
   .terms-list {
@@ -94,15 +119,16 @@
     font-size: 1rem;
     line-height: 1.7;
     color: var(--color-text-primary);
+    font-weight: 500;
   }
   
   .terms-list li:before {
-    content: "•";
+    content: "💪";
     position: absolute;
     left: 0;
-    color: var(--color-accent-1);
-    font-size: 1.5rem;
-    line-height: 1.2;
+    color: var(--color-accent-2);
+    font-size: 1rem;
+    line-height: 1.7;
   }
   
   .terms-contact {
@@ -111,17 +137,33 @@
   
   .terms-contact a {
     color: var(--color-primary);
-    font-weight: 500;
+    font-weight: 700;
     text-decoration: none;
     font-size: 1.125rem;
     transition: all 0.3s ease;
     display: inline-block;
     padding: var(--space-sm) 0;
+    position: relative;
   }
   
   .terms-contact a:hover {
     color: var(--color-accent-1);
-    transform: translateX(2px);
+    transform: translateX(4px) scale(1.05);
+  }
+  
+  .terms-contact a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--color-accent-2);
+    transition: width 0.3s ease;
+  }
+  
+  .terms-contact a:hover::after {
+    width: 100%;
   }
   
   .terms-footer {
@@ -131,6 +173,9 @@
   
   .terms-footer .btn {
     min-width: 200px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
   }
   
   /* Responsive Design */
@@ -164,6 +209,10 @@
     .terms-section {
       margin-bottom: var(--space-xl);
     }
+  
+    .terms-section:hover {
+      padding-left: var(--space-sm);
+    }
   }
   
   @media (max-width: 480px) {
@@ -177,7 +226,7 @@
   
     .terms-body {
       padding: var(--space-md);
-      border-radius: 16px;
+      border-radius: var(--radius-md);
     }
   
     .terms-section-title {

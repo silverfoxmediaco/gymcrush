@@ -50,12 +50,12 @@ const Settings = () => {
         return (
           <div className="settings-section">
             <h2>Billing & Subscription</h2>
-            <p>Manage your subscription and payment methods...</p>
+            <p>Manage your GymCrush Premium subscription and payment methods...</p>
             <button 
               className="btn btn-primary"
-              onClick={() => navigate('/profile#seeds')}
+              onClick={() => navigate('/profile#crushes')}
             >
-              Manage Seeds & Subscription
+              Manage Crushes & Subscription
             </button>
           </div>
         );

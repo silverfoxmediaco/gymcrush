@@ -18,7 +18,7 @@
     text-align: center;
     margin-bottom: calc(var(--space-xl) * 1.5);
     padding-bottom: var(--space-xl);
-    border-bottom: 2px solid rgba(147, 125, 194, 0.1);
+    border-bottom: 3px solid var(--color-accent-2);
   }
   
   .safety-title {
@@ -27,20 +27,32 @@
     color: var(--color-primary);
     margin-bottom: var(--space-md);
     font-family: var(--font-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
   
   .safety-effective-date {
     color: var(--color-text-muted);
     font-size: 1.125rem;
-    font-weight: 400;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
   
   .safety-body {
     background: white;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     padding: calc(var(--space-xl) * 1.5);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 16px rgba(255, 59, 48, 0.08);
     margin-bottom: var(--space-xl);
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+  }
+  
+  .safety-body:hover {
+    border-color: rgba(50, 255, 106, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 59, 48, 0.12);
   }
   
   .safety-intro {
@@ -49,16 +61,25 @@
     color: var(--color-text-primary);
     margin-bottom: calc(var(--space-xl) * 1.5);
     padding: var(--space-lg);
-    background: linear-gradient(135deg, rgba(176, 197, 164, 0.08), rgba(224, 174, 208, 0.08));
-    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(50, 255, 106, 0.08), rgba(255, 59, 48, 0.08));
+    border-radius: var(--radius-md);
     border-left: 4px solid var(--color-accent-2);
+    font-weight: 500;
   }
   
   /* Safety Tip Items */
   .safety-tip {
     margin-bottom: calc(var(--space-xl) * 1.5);
     padding-bottom: calc(var(--space-xl) * 1.5);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--color-neutral);
+    transition: all 0.3s ease;
+    padding-left: 0;
+    border-left: 3px solid transparent;
+  }
+  
+  .safety-tip:hover {
+    padding-left: var(--space-md);
+    border-left-color: var(--color-accent-2);
   }
   
   .safety-tip:last-of-type {
@@ -85,14 +106,23 @@
     font-weight: 700;
     border-radius: 50%;
     flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .safety-tip:hover .tip-number {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(255, 59, 48, 0.4);
   }
   
   .tip-title {
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--color-primary);
     margin: 0;
     font-family: var(--font-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
   
   .tip-text {
@@ -100,6 +130,7 @@
     line-height: 1.7;
     color: var(--color-text-primary);
     margin-bottom: var(--space-md);
+    font-weight: 500;
   }
   
   .tip-list {
@@ -115,6 +146,7 @@
     font-size: 1rem;
     line-height: 1.7;
     color: var(--color-text-primary);
+    font-weight: 500;
   }
   
   .tip-list li:last-child {
@@ -122,16 +154,15 @@
   }
   
   .tip-list li:before {
-    content: "✓";
+    content: "💪";
     position: absolute;
     left: 0;
     top: 0;
     width: 24px;
     height: 24px;
-    background: rgba(176, 197, 164, 0.15);
+    background: rgba(50, 255, 106, 0.15);
     color: var(--color-accent-2);
     font-size: 0.875rem;
-    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -140,40 +171,53 @@
   
   .tip-list strong {
     color: var(--color-primary);
-    font-weight: 600;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
   }
   
   .tip-emphasis {
     font-style: italic;
     color: var(--color-primary);
-    font-weight: 500;
+    font-weight: 600;
     margin-top: var(--space-md);
     padding: var(--space-md);
-    background: rgba(147, 125, 194, 0.05);
-    border-radius: 8px;
+    background: rgba(255, 59, 48, 0.05);
+    border-radius: var(--radius-sm);
     text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border: 1px solid rgba(255, 59, 48, 0.1);
   }
   
   .safety-email {
     color: var(--color-primary);
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
     transition: all 0.3s ease;
+    display: inline-block;
   }
   
   .safety-email:hover {
     color: var(--color-accent-1);
     text-decoration: underline;
+    transform: translateX(2px);
   }
   
   /* Reminder Section */
   .safety-reminder {
-    background: rgba(224, 174, 208, 0.08);
-    border: 1px solid rgba(224, 174, 208, 0.2);
-    border-radius: 12px;
+    background: rgba(50, 255, 106, 0.08);
+    border: 2px solid rgba(50, 255, 106, 0.3);
+    border-radius: var(--radius-md);
     padding: var(--space-lg);
     margin: calc(var(--space-xl) * 1.5) 0;
     text-align: center;
+    transition: all 0.3s ease;
+  }
+  
+  .safety-reminder:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(50, 255, 106, 0.15);
   }
   
   .reminder-text {
@@ -181,27 +225,54 @@
     line-height: 1.7;
     color: var(--color-text-primary);
     margin: 0;
+    font-weight: 600;
   }
   
   .reminder-text strong {
     color: var(--color-primary);
-    font-weight: 600;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
   }
   
   /* Closing Quote */
   .safety-closing {
     text-align: center;
     padding: var(--space-xl);
-    background: linear-gradient(135deg, rgba(147, 125, 194, 0.05), rgba(176, 197, 164, 0.05));
-    border-radius: 12px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-md);
     margin-top: var(--space-xl);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .safety-closing::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+  }
+  
+  @keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
   }
   
   .closing-quote {
     font-size: 1.375rem;
-    color: var(--color-primary);
+    color: white;
     font-style: italic;
     margin: 0;
+    position: relative;
+    z-index: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
   
   .closing-quote strong {
@@ -215,6 +286,9 @@
   
   .safety-footer .btn {
     min-width: 200px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
   }
   
   /* Responsive Design */
@@ -275,7 +349,7 @@
   
     .safety-body {
       padding: var(--space-md);
-      border-radius: 16px;
+      border-radius: var(--radius-md);
     }
   
     .tip-header {

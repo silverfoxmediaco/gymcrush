@@ -1,6 +1,6 @@
 // Terms of Service Page
 // Path: src/frontend/pages/TermsOfService.jsx
-// Purpose: Display terms of use for Wallflower.me
+// Purpose: Display terms of use for GymCrush.io
 
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -27,7 +27,7 @@ const TermsOfService = () => {
 
         <div className="terms-body">
           <p className="terms-intro">
-            Welcome to <strong>Wallflower.me</strong> ("Wallflower", "we", "our", or "us"). 
+            Welcome to <strong>GymCrush.io</strong> ("GymCrush", "we", "our", or "us"). 
             By accessing or using our website, mobile application, or any related services 
             (collectively, the "Service"), you agree to be bound by these Terms of Use ("Terms"). 
             Please read them carefully.
@@ -36,7 +36,7 @@ const TermsOfService = () => {
           <section className="terms-section">
             <h2 className="terms-section-title">1. Eligibility</h2>
             <p className="terms-text">
-              You must be at least 18 years old to use Wallflower. By using the Service, 
+              You must be at least 18 years old to use GymCrush. By using the Service, 
               you represent and warrant that:
             </p>
             <ul className="terms-list">
@@ -58,12 +58,13 @@ const TermsOfService = () => {
           <section className="terms-section">
             <h2 className="terms-section-title">3. Community Guidelines</h2>
             <p className="terms-text">
-              Wallflower is a space for respectful and intentional connection. You agree not to:
+              GymCrush is a space for respectful fitness connections and relationships. You agree not to:
             </p>
             <ul className="terms-list">
               <li>Harass, abuse, threaten, or intimidate others.</li>
               <li>Impersonate any person or entity.</li>
               <li>Post false, misleading, or inappropriate content.</li>
+              <li>Promote unsafe fitness practices or harmful substances.</li>
               <li>Violate any applicable laws or regulations.</li>
             </ul>
             <p className="terms-text">
@@ -76,7 +77,7 @@ const TermsOfService = () => {
             <h2 className="terms-section-title">4. User Content</h2>
             <p className="terms-text">
               You retain ownership of any content you post, upload, or submit ("User Content"). 
-              By sharing User Content, you grant Wallflower a non-exclusive, royalty-free, 
+              By sharing User Content, you grant GymCrush a non-exclusive, royalty-free, 
               worldwide license to use, display, and distribute your content in connection 
               with the Service.
             </p>
@@ -85,7 +86,7 @@ const TermsOfService = () => {
           <section className="terms-section">
             <h2 className="terms-section-title">5. Paid Features</h2>
             <p className="terms-text">
-              Some features may require payment (e.g., sending premium flowers/seeds). 
+              Some features may require payment (e.g., sending crushes, premium features). 
               All purchases are final and non-refundable except as required by law. 
               We reserve the right to change pricing or features at any time.
             </p>
@@ -95,7 +96,7 @@ const TermsOfService = () => {
             <h2 className="terms-section-title">6. Intellectual Property</h2>
             <p className="terms-text">
               All trademarks, logos, and content (excluding User Content) are the property 
-              of Wallflower or its licensors. You may not copy, modify, or distribute any 
+              of GymCrush or its licensors. You may not copy, modify, or distribute any 
               part of our Service without prior written consent.
             </p>
           </section>
@@ -113,7 +114,7 @@ const TermsOfService = () => {
             <h2 className="terms-section-title">8. Disclaimer and Limitation of Liability</h2>
             <p className="terms-text">
               The Service is provided "as is" and "as available." We make no warranties of 
-              any kind, express or implied. To the fullest extent permitted by law, Wallflower 
+              any kind, express or implied. To the fullest extent permitted by law, GymCrush 
               disclaims all liability for any damages resulting from your use of the Service.
             </p>
           </section>
@@ -141,7 +142,7 @@ const TermsOfService = () => {
               If you have any questions about these Terms, please contact us at:
             </p>
             <p className="terms-contact">
-              <a href="mailto:support@wallflower.me">support@wallflower.me</a>
+              <a href="mailto:support@gymcrush.io">support@gymcrush.io</a>
             </p>
           </section>
         </div>
