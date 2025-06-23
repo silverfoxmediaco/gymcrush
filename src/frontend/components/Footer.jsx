@@ -6,6 +6,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './Footer.css';
 import gymcrushLogo from '../assets/images/gymcrushlogo2.png';
+import facebookIcon from '../assets/images/facebook (1).png';
+import tiktokIcon from '../assets/images/tiktok.png';
+import instagramIcon from '../assets/images/instagram.png';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -58,13 +61,13 @@ const Footer = () => {
           <h4 className="footer-heading">Connect</h4>
           <div className="social-links">
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <span className="social-icon">📷</span>
+              <img src={instagramIcon} alt="Instagram" className="social-icon-img" />
             </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-              <span className="social-icon">🐦</span>
+            <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <img src={tiktokIcon} alt="TikTok" className="social-icon-img" />
             </a>
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-              <span className="social-icon">📘</span>
+              <img src={facebookIcon} alt="Facebook" className="social-icon-img" />
             </a>
           </div>
           <div className="newsletter">

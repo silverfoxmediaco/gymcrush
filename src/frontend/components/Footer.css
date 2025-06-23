@@ -118,7 +118,7 @@
     justify-content: center;
     width: 40px;
     height: 40px;
-    background: var(--color-primary);
+    background: white;
     border-radius: 50%;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -133,6 +133,17 @@
   
   .social-icon {
     font-size: 1.25rem;
+  }
+  
+  .social-icon-img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+  }
+  
+  .social-links a:hover .social-icon-img {
+    filter: brightness(0) invert(1) drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
   }
   
   /* Newsletter */
