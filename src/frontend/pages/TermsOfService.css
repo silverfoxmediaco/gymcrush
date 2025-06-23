@@ -1,0 +1,195 @@
+/* Terms of Service Page Styles
+   Path: src/frontend/pages/TermsOfService.css
+   Purpose: Styling for the Terms of Service page */
+
+   .terms-page {
+    min-height: 100vh;
+    background-color: var(--color-background);
+    padding: var(--space-xl) 0;
+  }
+  
+  .terms-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+  }
+  
+  .terms-header {
+    text-align: center;
+    margin-bottom: calc(var(--space-xl) * 1.5);
+    padding-bottom: var(--space-xl);
+    border-bottom: 2px solid rgba(147, 125, 194, 0.1);
+  }
+  
+  .terms-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--space-md);
+    font-family: var(--font-primary);
+  }
+  
+  .terms-effective-date {
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+    font-weight: 400;
+  }
+  
+  .terms-body {
+    background: white;
+    border-radius: 20px;
+    padding: calc(var(--space-xl) * 1.5);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    margin-bottom: var(--space-xl);
+  }
+  
+  .terms-intro {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--color-text-primary);
+    margin-bottom: calc(var(--space-xl) * 1.5);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .terms-intro strong {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  
+  .terms-section {
+    margin-bottom: calc(var(--space-xl) * 1.5);
+  }
+  
+  .terms-section:last-child {
+    margin-bottom: 0;
+  }
+  
+  .terms-section-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: var(--space-lg);
+    font-family: var(--font-primary);
+  }
+  
+  .terms-text {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-md);
+    font-weight: 400;
+  }
+  
+  .terms-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-md) 0 var(--space-lg) 0;
+  }
+  
+  .terms-list li {
+    position: relative;
+    padding-left: var(--space-lg);
+    margin-bottom: var(--space-sm);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text-primary);
+  }
+  
+  .terms-list li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--color-accent-1);
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  
+  .terms-contact {
+    margin-top: var(--space-md);
+  }
+  
+  .terms-contact a {
+    color: var(--color-primary);
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 1.125rem;
+    transition: all 0.3s ease;
+    display: inline-block;
+    padding: var(--space-sm) 0;
+  }
+  
+  .terms-contact a:hover {
+    color: var(--color-accent-1);
+    transform: translateX(2px);
+  }
+  
+  .terms-footer {
+    text-align: center;
+    margin-top: calc(var(--space-xl) * 2);
+  }
+  
+  .terms-footer .btn {
+    min-width: 200px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .terms-page {
+      padding: var(--space-lg) 0;
+    }
+  
+    .terms-container {
+      padding: 0 var(--space-md);
+    }
+  
+    .terms-title {
+      font-size: 2.25rem;
+    }
+  
+    .terms-body {
+      padding: var(--space-lg);
+    }
+  
+    .terms-intro {
+      font-size: 1rem;
+      margin-bottom: var(--space-xl);
+    }
+  
+    .terms-section-title {
+      font-size: 1.5rem;
+      margin-bottom: var(--space-md);
+    }
+  
+    .terms-section {
+      margin-bottom: var(--space-xl);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .terms-title {
+      font-size: 1.75rem;
+    }
+  
+    .terms-effective-date {
+      font-size: 1rem;
+    }
+  
+    .terms-body {
+      padding: var(--space-md);
+      border-radius: 16px;
+    }
+  
+    .terms-section-title {
+      font-size: 1.25rem;
+    }
+  
+    .terms-text,
+    .terms-list li {
+      font-size: 0.938rem;
+    }
+  
+    .terms-contact a {
+      font-size: 1rem;
+    }
+  }

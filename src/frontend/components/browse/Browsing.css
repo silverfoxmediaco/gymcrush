@@ -1,0 +1,282 @@
+/* Browsing Component Styles - UPDATED */
+/* Path: src/frontend/components/browse/Browsing.css */
+/* Purpose: Styles for vertical scroll browsing interface */
+
+.browsing-page-container {
+  min-height: 100vh;
+  background-color: var(--color-background);
+}
+
+.browsing-container {
+  padding: var(--space-xl) var(--space-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Profiles Grid - Updated for centering */
+.profiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 350px));
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
+  justify-content: center; /* Centers the grid items */
+}
+
+/* Profile Card */
+.profile-card-browse {
+  background: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(255, 59, 48, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%; /* Ensure cards fill their grid cell */
+  max-width: 350px; /* Maximum width for cards */
+  border: 2px solid transparent;
+}
+
+.profile-card-browse:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(255, 59, 48, 0.12);
+  border-color: var(--color-accent-green);
+}
+
+/* Profile Image Container */
+.profile-image-container {
+  height: 400px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.profile-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 70%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* No photo placeholder */
+.no-photo-placeholder {
+  text-align: center;
+  color: white;
+}
+
+.no-photo-placeholder span {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--space-sm);
+}
+
+.no-photo-placeholder p {
+  font-size: 1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Profile Info Bottom */
+.profile-info-bottom {
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.profile-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.profile-location {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  margin-bottom: var(--space-md);
+  font-weight: 500;
+}
+
+/* Crush Button */
+.crush-btn {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  background: linear-gradient(135deg, var(--color-primary-red), var(--color-alert-pink));
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.crush-btn:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+}
+
+.crush-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.crush-btn.crush-sent {
+  background: linear-gradient(135deg, var(--color-accent-green), #28D065);
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+}
+
+/* Out of crushes overlay */
+.out-of-crushes-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, var(--color-primary-red), var(--color-alert-pink));
+  color: white;
+  padding: var(--space-lg);
+  text-align: center;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 200;
+}
+
+.out-of-crushes-overlay p {
+  margin-bottom: var(--space-md);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cta-btn {
+  background-color: white;
+  color: var(--color-primary-red);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.cta-btn:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Loading and error states */
+.loading-message,
+.error-message,
+.no-profiles-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: var(--space-xl);
+}
+
+.loading-message p,
+.error-message p,
+.no-profiles-message p {
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-lg);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.no-profiles-message h2 {
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1200px) {
+  .profiles-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+  }
+}
+
+@media (max-width: 768px) {
+  .browsing-container {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .profiles-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .profile-image-container {
+    height: 500px;
+  }
+
+  .profile-info-bottom {
+    padding: var(--space-md);
+  }
+
+  .profile-name {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profiles-grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: var(--space-lg);
+  }
+  
+  .profile-card-browse {
+    max-width: 100%;
+  }
+  
+  .profile-image-container {
+    height: 500px;
+  }
+}
+
+/* Button primary for consistency */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary-red), var(--color-alert-pink));
+  color: white;
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+}

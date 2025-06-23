@@ -1,0 +1,311 @@
+/* Safety Tips Page Styles
+   Path: src/frontend/pages/SafetyTips.css
+   Purpose: Styling for the Safety Tips page */
+
+   .safety-page {
+    min-height: 100vh;
+    background-color: var(--color-background);
+    padding: var(--space-xl) 0;
+  }
+  
+  .safety-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+  }
+  
+  .safety-header {
+    text-align: center;
+    margin-bottom: calc(var(--space-xl) * 1.5);
+    padding-bottom: var(--space-xl);
+    border-bottom: 2px solid rgba(147, 125, 194, 0.1);
+  }
+  
+  .safety-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--space-md);
+    font-family: var(--font-primary);
+  }
+  
+  .safety-effective-date {
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+    font-weight: 400;
+  }
+  
+  .safety-body {
+    background: white;
+    border-radius: 20px;
+    padding: calc(var(--space-xl) * 1.5);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    margin-bottom: var(--space-xl);
+  }
+  
+  .safety-intro {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--color-text-primary);
+    margin-bottom: calc(var(--space-xl) * 1.5);
+    padding: var(--space-lg);
+    background: linear-gradient(135deg, rgba(176, 197, 164, 0.08), rgba(224, 174, 208, 0.08));
+    border-radius: 12px;
+    border-left: 4px solid var(--color-accent-2);
+  }
+  
+  /* Safety Tip Items */
+  .safety-tip {
+    margin-bottom: calc(var(--space-xl) * 1.5);
+    padding-bottom: calc(var(--space-xl) * 1.5);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .safety-tip:last-of-type {
+    border-bottom: none;
+    margin-bottom: var(--space-xl);
+  }
+  
+  .tip-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+  
+  .tip-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: var(--gradient-primary);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  
+  .tip-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin: 0;
+    font-family: var(--font-primary);
+  }
+  
+  .tip-text {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-md);
+  }
+  
+  .tip-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .tip-list li {
+    position: relative;
+    padding-left: calc(var(--space-lg) + var(--space-sm));
+    margin-bottom: var(--space-md);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text-primary);
+  }
+  
+  .tip-list li:last-child {
+    margin-bottom: 0;
+  }
+  
+  .tip-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    background: rgba(176, 197, 164, 0.15);
+    color: var(--color-accent-2);
+    font-size: 0.875rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .tip-list strong {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  
+  .tip-emphasis {
+    font-style: italic;
+    color: var(--color-primary);
+    font-weight: 500;
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background: rgba(147, 125, 194, 0.05);
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .safety-email {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .safety-email:hover {
+    color: var(--color-accent-1);
+    text-decoration: underline;
+  }
+  
+  /* Reminder Section */
+  .safety-reminder {
+    background: rgba(224, 174, 208, 0.08);
+    border: 1px solid rgba(224, 174, 208, 0.2);
+    border-radius: 12px;
+    padding: var(--space-lg);
+    margin: calc(var(--space-xl) * 1.5) 0;
+    text-align: center;
+  }
+  
+  .reminder-text {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+  
+  .reminder-text strong {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  
+  /* Closing Quote */
+  .safety-closing {
+    text-align: center;
+    padding: var(--space-xl);
+    background: linear-gradient(135deg, rgba(147, 125, 194, 0.05), rgba(176, 197, 164, 0.05));
+    border-radius: 12px;
+    margin-top: var(--space-xl);
+  }
+  
+  .closing-quote {
+    font-size: 1.375rem;
+    color: var(--color-primary);
+    font-style: italic;
+    margin: 0;
+  }
+  
+  .closing-quote strong {
+    font-weight: 700;
+  }
+  
+  .safety-footer {
+    text-align: center;
+    margin-top: calc(var(--space-xl) * 2);
+  }
+  
+  .safety-footer .btn {
+    min-width: 200px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .safety-page {
+      padding: var(--space-lg) 0;
+    }
+  
+    .safety-container {
+      padding: 0 var(--space-md);
+    }
+  
+    .safety-title {
+      font-size: 2.25rem;
+    }
+  
+    .safety-body {
+      padding: var(--space-lg);
+    }
+  
+    .safety-intro {
+      font-size: 1rem;
+      padding: var(--space-md);
+    }
+  
+    .tip-header {
+      gap: var(--space-sm);
+    }
+  
+    .tip-number {
+      width: 40px;
+      height: 40px;
+      font-size: 1.25rem;
+    }
+  
+    .tip-title {
+      font-size: 1.25rem;
+    }
+  
+    .safety-tip {
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-xl);
+    }
+  
+    .closing-quote {
+      font-size: 1.125rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .safety-title {
+      font-size: 1.75rem;
+    }
+  
+    .safety-effective-date {
+      font-size: 1rem;
+    }
+  
+    .safety-body {
+      padding: var(--space-md);
+      border-radius: 16px;
+    }
+  
+    .tip-header {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .tip-title {
+      font-size: 1.125rem;
+    }
+  
+    .tip-text,
+    .tip-list li {
+      font-size: 0.938rem;
+    }
+  
+    .tip-list li {
+      padding-left: var(--space-lg);
+    }
+  
+    .reminder-text {
+      font-size: 1rem;
+    }
+  
+    .safety-reminder,
+    .safety-closing {
+      padding: var(--space-md);
+    }
+  
+    .closing-quote {
+      font-size: 1rem;
+    }
+  }

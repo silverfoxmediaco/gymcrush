@@ -1,0 +1,49 @@
+{
+  "name": "gymcrush",
+  "version": "1.0.0",
+  "description": "Where Strength Meets Community",
+  "author": "GymCrush Team",
+  "main": "server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon server.js",
+    "client": "vite",
+    "build": "vite build",
+    "start": "node server.js",
+    "preview": "vite preview",
+    "install-all": "npm install"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "axios": "^1.6.2",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "multer": "^2.0.1",
+    "multer-storage-cloudinary": "^4.0.0",
+    "nodemailer": "^6.10.1",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.9.1",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.30.1",
+    "socket.io": "^4.5.4",
+    "socket.io-client": "^4.5.4",
+    "stripe": "^14.25.0",
+    "vite": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "concurrently": "^8.2.1",
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0 <24.0.0",
+    "npm": ">=8.0.0"
+  }
+}
