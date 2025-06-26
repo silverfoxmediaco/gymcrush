@@ -15,12 +15,16 @@ const Profile = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showCrushes, setShowCrushes] = useState(false);
   const [filterPreferences, setFilterPreferences] = useState({});
+  const [gettingLocation, setGettingLocation] = useState(false);
   const [profileData, setProfileData] = useState({
     username: '',
     age: '',
+    gender: '',
     height: '',
     bodyType: '',
     location: '',
+    coordinates: null,
+    locationType: 'manual',
     bio: '',
     interests: [],
     lookingFor: '',
@@ -89,9 +93,12 @@ const Profile = () => {
           ...prev,
           username: data.profile.username || '',
           age: profile.age || '',
+          gender: profile.gender || '',
           height: profile.height || '',
           bodyType: profile.bodyType || '',
           location: profile.location || '',
+          coordinates: profile.coordinates?.coordinates || null,
+          locationType: profile.locationType || 'manual',
           bio: profile.bio || '',
           interests: profile.interests || [],
           lookingFor: profile.lookingFor || '',
@@ -284,12 +291,79 @@ const Profile = () => {
     return Math.round((completed / total) * 100);
   };
 
+  const handleUseCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setGettingLocation(true);
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        try {
+          // Reverse geocode to get city name
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await response.json();
+          
+          const city = data.address.city || data.address.town || data.address.village;
+          const state = data.address.state;
+          const displayLocation = `${city}, ${state}`;
+          
+          setProfileData(prev => ({
+            ...prev,
+            location: displayLocation,
+            coordinates: [longitude, latitude],
+            locationType: 'device'
+          }));
+          
+          setGettingLocation(false);
+        } catch (error) {
+          console.error('Reverse geocoding error:', error);
+          setGettingLocation(false);
+          alert('Could not determine your city. Please enter manually.');
+        }
+      },
+      (error) => {
+        setGettingLocation(false);
+        console.error('Geolocation error:', error);
+        alert('Could not get your location. Please enter manually.');
+      }
+    );
+  };
+
+  const geocodeLocation = async (location) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`
+      );
+      const data = await response.json();
+      
+      if (data && data[0]) {
+        return [parseFloat(data[0].lon), parseFloat(data[0].lat)];
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+    }
+    return null;
+  };
+
   const handleSaveProfile = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         alert('Please log in to save your profile');
         return;
+      }
+
+      // If location was entered manually and we don't have coordinates, geocode it
+      let coordinates = profileData.coordinates;
+      if (profileData.location && !coordinates && profileData.locationType === 'manual') {
+        coordinates = await geocodeLocation(profileData.location);
       }
 
       const response = await fetch('/api/profile', {
@@ -300,9 +374,12 @@ const Profile = () => {
         },
         body: JSON.stringify({
           age: profileData.age,
+          gender: profileData.gender,
           height: profileData.height,
           bodyType: profileData.bodyType,
           location: profileData.location,
+          coordinates: coordinates,
+          locationType: profileData.locationType,
           bio: profileData.bio,
           interests: profileData.interests,
           lookingFor: profileData.lookingFor,
@@ -436,6 +513,19 @@ const Profile = () => {
             </div>
 
             <div className="form-group">
+              <label>Gender*</label>
+              <select
+                value={profileData.gender}
+                onChange={(e) => handleInputChange('gender', e.target.value)}
+              >
+                <option value="">Select gender</option>
+                <option value="Man">Man</option>
+                <option value="Woman">Woman</option>
+                <option value="Non-binary">Non-binary</option>
+              </select>
+            </div>
+
+            <div className="form-group">
               <label>Height</label>
               <select
                 value={profileData.height}
@@ -463,12 +553,34 @@ const Profile = () => {
 
             <div className="form-group">
               <label>Location*</label>
-              <input
-                type="text"
-                value={profileData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
-                placeholder="City, State"
-              />
+              <div className="location-input-group">
+                <input
+                  type="text"
+                  value={profileData.location}
+                  onChange={(e) => {
+                    handleInputChange('location', e.target.value);
+                    // Reset coordinates and type when manually changing location
+                    setProfileData(prev => ({
+                      ...prev,
+                      coordinates: null,
+                      locationType: 'manual'
+                    }));
+                  }}
+                  placeholder="City, State (e.g., Austin, TX)"
+                  className="location-input"
+                />
+                <button
+                  type="button"
+                  className="btn-location"
+                  onClick={handleUseCurrentLocation}
+                  disabled={gettingLocation}
+                >
+                  {gettingLocation ? '📍 Getting location...' : '📍 Use Current Location'}
+                </button>
+              </div>
+              <small className="form-hint">
+                Your exact location is never shown to other users
+              </small>
             </div>
           </div>
         </section>
@@ -619,20 +731,20 @@ const Profile = () => {
 
         {/* Crushes Section */}
         <section className="profile-section">
-        <div className="my-crushes-header">
-          <h2>My Crushes</h2>
-          <button 
-            className="btn-secondary my-crushes-toggle" 
-            onClick={() => setShowCrushes(!showCrushes)}
-          >
-            {showCrushes ? 'Hide' : 'Show'} Crushes
-          </button>
-        </div>
-        
-        {showCrushes && (
-          <CrushComponent isEmbedded={true} />
-        )}
-      </section>
+          <div className="my-crushes-header">
+            <h2>My Crushes</h2>
+            <button 
+              className="btn-secondary my-crushes-toggle" 
+              onClick={() => setShowCrushes(!showCrushes)}
+            >
+              {showCrushes ? 'Hide' : 'Show'} Crushes
+            </button>
+          </div>
+          
+          {showCrushes && (
+            <CrushComponent isEmbedded={true} />
+          )}
+        </section>
 
         {/* Action Buttons */}
         <div className="profile-actions">
@@ -681,6 +793,7 @@ const Profile = () => {
                 <p className="preview-location">{profileData.location || 'Location not set'}</p>
 
                 <div className="preview-details">
+                  {profileData.gender && <span>Gender: {profileData.gender}</span>}
                   {profileData.height && <span>Height: {profileData.height}</span>}
                   {profileData.bodyType && <span>Body Type: {profileData.bodyType}</span>}
                   {profileData.lookingFor && <span>Looking for: {profileData.lookingFor}</span>}

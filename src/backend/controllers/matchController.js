@@ -30,14 +30,28 @@ exports.getBrowseProfiles = [verifyToken, async (req, res) => {
 
     const sentCrushUserIds = currentUser.crushes.sent.map(crush => crush.to);
 
-    const profiles = await User.find({
+    let filterQuery = {
       _id: {
         $ne: req.userId,
         $nin: sentCrushUserIds
       },
       'profile.bio': { $exists: true, $ne: '' },
       'profile.interests': { $exists: true, $ne: [] }
-    })
+    };
+
+    if (currentUser.filterPreferences?.gender?.length > 0 && 
+      !currentUser.filterPreferences.gender.includes('Other')) {
+      // Convert plural preference to singular for matching
+      const genderFilter = currentUser.filterPreferences.gender.map(g => {
+        if (g === 'Men') return 'Man';
+        if (g === 'Women') return 'Woman';
+        return g;
+      });
+      filterQuery['profile.gender'] = { $in: genderFilter };
+    }
+
+    // USE filterQuery here, not the hardcoded object
+    const profiles = await User.find(filterQuery)
       .select('-password -email')
       .limit(10);
 
@@ -45,6 +59,7 @@ exports.getBrowseProfiles = [verifyToken, async (req, res) => {
       id: user._id,
       username: user.username,
       age: user.profile.age || 'Not specified',
+      gender: user.profile.gender || 'Not specified',
       height: user.profile.height || 'Not specified',
       bodyType: user.profile.bodyType || 'Not specified',
       location: user.profile.location || 'Location not set',

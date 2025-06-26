@@ -120,7 +120,7 @@ const NotificationSettings = () => {
               checked={notifications.emailEnabled}
               onChange={handleMasterToggle}
             />
-            <span className="slider"></span>
+            <span className="toggle-slider-master"></span>
           </label>
         </div>
       </div>
@@ -141,7 +141,7 @@ const NotificationSettings = () => {
               onChange={() => handleToggle('crushReceived')}
               disabled={!notifications.emailEnabled}
             />
-            <span className="slider"></span>
+            <span className="toggle-slider-crush"></span>
           </label>
         </div>
 
@@ -157,7 +157,7 @@ const NotificationSettings = () => {
               onChange={() => handleToggle('newMessage')}
               disabled={!notifications.emailEnabled}
             />
-            <span className="slider"></span>
+            <span className="toggle-slider-message"></span>
           </label>
         </div>
 
@@ -173,7 +173,7 @@ const NotificationSettings = () => {
               onChange={() => handleToggle('newMatch')}
               disabled={!notifications.emailEnabled}
             />
-            <span className="slider"></span>
+            <span className="toggle-slider-match"></span>
           </label>
         </div>
 
@@ -189,7 +189,7 @@ const NotificationSettings = () => {
               onChange={() => handleToggle('lowCrushBalance')}
               disabled={!notifications.emailEnabled}
             />
-            <span className="slider"></span>
+            <span className="toggle-slider-balance"></span>
           </label>
         </div>
 
@@ -205,7 +205,7 @@ const NotificationSettings = () => {
               onChange={() => handleToggle('marketing')}
               disabled={!notifications.emailEnabled}
             />
-            <span className="slider"></span>
+            <span className="toggle-slider-marketing"></span>
           </label>
         </div>
       </div>
