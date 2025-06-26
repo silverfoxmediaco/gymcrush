@@ -21,8 +21,6 @@ const FilterSettings = ({ onSave, initialFilters = {} }) => {
   const genderOptions = [
     'Men',
     'Women',
-    'Non-binary',
-    'Everyone'
   ];
 
   const lookingForOptions = [
@@ -60,6 +58,15 @@ const FilterSettings = ({ onSave, initialFilters = {} }) => {
 
   const handleMultiSelect = (field, value) => {
     setFilters(prev => {
+      // Special handling for gender - only allow one selection
+      if (field === 'gender') {
+        return {
+          ...prev,
+          [field]: [value] // Always replace with single value in array
+        };
+      }
+      
+      // Rest of the fields work as multi-select
       const currentValues = prev[field] || [];
       const index = currentValues.indexOf(value);
       
@@ -140,7 +147,7 @@ const FilterSettings = ({ onSave, initialFilters = {} }) => {
             max="200"
             value={filters.distance}
             onChange={(e) => handleChange('distance', parseInt(e.target.value))}
-            className="slider"
+            className="distance-range-slider"
           />
           <div className="distance-display">{filters.distance} miles</div>
         </div>
@@ -207,25 +214,6 @@ const FilterSettings = ({ onSave, initialFilters = {} }) => {
             ))}
           </select>
         </div>
-      </div>
-
-      {/* Shared Interests */}
-      <div className="filter-group">
-        <label className="filter-label">Must Have These Fitness Interests (Optional)</label>
-        <div className="multi-select-grid">
-          {interestOptions.map(interest => (
-            <button
-              key={interest}
-              className={`filter-chip ${filters.interests.includes(interest) ? 'selected' : ''}`}
-              onClick={() => handleMultiSelect('interests', interest)}
-            >
-              {interest}
-            </button>
-          ))}
-        </div>
-        {filters.interests.length === 0 && (
-          <p className="filter-hint">Leave empty to see all fitness interests</p>
-        )}
       </div>
 
       {/* Action Buttons */}

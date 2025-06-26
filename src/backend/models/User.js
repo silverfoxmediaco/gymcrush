@@ -44,9 +44,30 @@ const userSchema = new mongoose.Schema({
   },
   profile: {
     age: Number,
+    gender: {
+      type: String,
+      enum: ['Man', 'Woman', 'Non-binary', 'Other'],
+      required: true,
+    },
     height: String,
     bodyType: String,
     location: String,
+    coordinates: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point'
+      },
+      coordinates: {
+        type: [Number],
+        index: '2dsphere'
+      }
+    },
+    locationType: {
+      type: String,
+      enum: ['device', 'manual', 'approximate'],
+      default: 'manual'
+    },
     bio: {
       type: String,
       maxLength: 500,
@@ -187,20 +208,14 @@ const userSchema = new mongoose.Schema({
       type: Number,
       default: 50
     },
-    interestedIn: {
+    gender: [{
       type: String,
-      enum: ['men', 'women', 'everyone'],
-      default: 'everyone'
-    },
+      enum: ['Men', 'Women']
+    }],
     hasPhoto: {
       type: Boolean,
       default: false
     },
-    fitnessLevel: {
-      type: String,
-      enum: ['any', 'beginner', 'intermediate', 'advanced', 'athlete'],
-      default: 'any'
-    }
   },
   createdAt: {
     type: Date,

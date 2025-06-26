@@ -206,7 +206,13 @@
   height: 0;
 }
 
-.slider {
+/* Base styles for all toggle sliders */
+.toggle-slider-master,
+.toggle-slider-crush,
+.toggle-slider-message,
+.toggle-slider-match,
+.toggle-slider-balance,
+.toggle-slider-marketing {
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -219,7 +225,12 @@
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.slider:before {
+.toggle-slider-master:before,
+.toggle-slider-crush:before,
+.toggle-slider-message:before,
+.toggle-slider-match:before,
+.toggle-slider-balance:before,
+.toggle-slider-marketing:before {
   position: absolute;
   content: "";
   height: 22px;
@@ -232,32 +243,66 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.toggle-switch input:checked + .slider {
+/* Checked state for all sliders */
+.toggle-switch input:checked + .toggle-slider-master,
+.toggle-switch input:checked + .toggle-slider-crush,
+.toggle-switch input:checked + .toggle-slider-message,
+.toggle-switch input:checked + .toggle-slider-match,
+.toggle-switch input:checked + .toggle-slider-balance,
+.toggle-switch input:checked + .toggle-slider-marketing {
   background: var(--gradient-primary);
   box-shadow: inset 0 2px 4px rgba(255, 59, 48, 0.2), 0 0 20px rgba(255, 59, 48, 0.2);
 }
 
-.toggle-switch input:focus + .slider {
+/* Focus state */
+.toggle-switch input:focus + .toggle-slider-master,
+.toggle-switch input:focus + .toggle-slider-crush,
+.toggle-switch input:focus + .toggle-slider-message,
+.toggle-switch input:focus + .toggle-slider-match,
+.toggle-switch input:focus + .toggle-slider-balance,
+.toggle-switch input:focus + .toggle-slider-marketing {
   box-shadow: 0 0 0 4px rgba(255, 59, 48, 0.2);
 }
 
-.toggle-switch input:checked + .slider:before {
+/* Move thumb when checked */
+.toggle-switch input:checked + .toggle-slider-master:before,
+.toggle-switch input:checked + .toggle-slider-crush:before,
+.toggle-switch input:checked + .toggle-slider-message:before,
+.toggle-switch input:checked + .toggle-slider-match:before,
+.toggle-switch input:checked + .toggle-slider-balance:before,
+.toggle-switch input:checked + .toggle-slider-marketing:before {
   transform: translateX(28px);
   box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
 }
 
-.toggle-switch input:disabled + .slider {
+/* Disabled state */
+.toggle-switch input:disabled + .toggle-slider-master,
+.toggle-switch input:disabled + .toggle-slider-crush,
+.toggle-switch input:disabled + .toggle-slider-message,
+.toggle-switch input:disabled + .toggle-slider-match,
+.toggle-switch input:disabled + .toggle-slider-balance,
+.toggle-switch input:disabled + .toggle-slider-marketing {
   opacity: 0.5;
   cursor: not-allowed;
   background: #F5F5F5;
 }
 
-/* Hover effect for toggle */
-.toggle-switch:not(:has(input:disabled)):hover .slider {
+/* Hover effects */
+.toggle-switch:not(:has(input:disabled)):hover .toggle-slider-master,
+.toggle-switch:not(:has(input:disabled)):hover .toggle-slider-crush,
+.toggle-switch:not(:has(input:disabled)):hover .toggle-slider-message,
+.toggle-switch:not(:has(input:disabled)):hover .toggle-slider-match,
+.toggle-switch:not(:has(input:disabled)):hover .toggle-slider-balance,
+.toggle-switch:not(:has(input:disabled)):hover .toggle-slider-marketing {
   box-shadow: 0 0 12px rgba(255, 59, 48, 0.2);
 }
 
-.toggle-switch:not(:has(input:disabled)):hover input:checked + .slider {
+.toggle-switch:not(:has(input:disabled)):hover input:checked + .toggle-slider-master,
+.toggle-switch:not(:has(input:disabled)):hover input:checked + .toggle-slider-crush,
+.toggle-switch:not(:has(input:disabled)):hover input:checked + .toggle-slider-message,
+.toggle-switch:not(:has(input:disabled)):hover input:checked + .toggle-slider-match,
+.toggle-switch:not(:has(input:disabled)):hover input:checked + .toggle-slider-balance,
+.toggle-switch:not(:has(input:disabled)):hover input:checked + .toggle-slider-marketing {
   box-shadow: inset 0 2px 4px rgba(255, 59, 48, 0.2), 0 0 24px rgba(255, 59, 48, 0.3);
 }
 

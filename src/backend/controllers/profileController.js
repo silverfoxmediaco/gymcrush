@@ -43,6 +43,7 @@ exports.updateProfile = [verifyToken, async (req, res) => {
   try {
     const {
       age,
+      gender,
       height,
       bodyType,
       location,
@@ -57,6 +58,7 @@ exports.updateProfile = [verifyToken, async (req, res) => {
     
     const updateData = {
       'profile.age': age,
+      'profile.gender': gender,
       'profile.height': height,
       'profile.bodyType': bodyType,
       'profile.location': location,
@@ -222,16 +224,73 @@ exports.updatePhotoDisplayMode = [verifyToken, async (req, res) => {
 // NEW: Get all user profiles for browsing
 exports.getAllProfiles = [verifyToken, async (req, res) => {
   try {
-    const users = await User.find({
+    const currentUser = await User.findById(req.userId);
+    
+    let filterQuery = {
       _id: { $ne: req.userId },
       'profile.bio': { $exists: true, $ne: '' },
       'profile.interests': { $exists: true, $ne: [] }
-    }).select('-password -email');
+    };
+
+    // Apply gender filter
+    if (currentUser.filterPreferences?.gender?.length > 0 && 
+        !currentUser.filterPreferences.gender.includes('Other')) {
+      const genderFilter = currentUser.filterPreferences.gender.map(g => {
+        if (g === 'Men') return 'Man';
+        if (g === 'Women') return 'Woman';
+        return g;
+      });
+      filterQuery['profile.gender'] = { $in: genderFilter };
+    }
+
+    // Apply age filter
+    if (currentUser.filterPreferences?.minAge || currentUser.filterPreferences?.maxAge) {
+      filterQuery['profile.age'] = {};
+      if (currentUser.filterPreferences.minAge) {
+        filterQuery['profile.age'].$gte = currentUser.filterPreferences.minAge;
+      }
+      if (currentUser.filterPreferences.maxAge) {
+        filterQuery['profile.age'].$lte = currentUser.filterPreferences.maxAge;
+      }
+    }
+
+    // Apply lookingFor filter - match people looking for the same things
+    if (currentUser.filterPreferences?.lookingFor?.length > 0) {
+      filterQuery['profile.lookingFor'] = { 
+        $in: currentUser.filterPreferences.lookingFor 
+      };
+    }
+
+    // Get initial results
+    let users = await User.find(filterQuery).select('-password -email');
+
+    // Apply height filter in application layer (since height is stored as string)
+    if (currentUser.filterPreferences?.heightMin || currentUser.filterPreferences?.heightMax) {
+      const heightToInches = (heightStr) => {
+        if (!heightStr) return 0;
+        const match = heightStr.match(/(\d+)'(\d+)"/);
+        if (match) {
+          return parseInt(match[1]) * 12 + parseInt(match[2]);
+        }
+        return 0;
+      };
+
+      const minInches = heightToInches(currentUser.filterPreferences.heightMin);
+      const maxInches = heightToInches(currentUser.filterPreferences.heightMax);
+
+      users = users.filter(user => {
+        const profileInches = heightToInches(user.profile.height);
+        if (minInches && profileInches < minInches) return false;
+        if (maxInches && profileInches > maxInches) return false;
+        return true;
+      });
+    }
 
     const profiles = users.map(user => ({
       id: user._id,
       username: user.username,
       age: user.profile.age || 'Not specified',
+      gender: user.profile.gender || 'Not specified',
       height: user.profile.height || 'Not specified',
       bodyType: user.profile.bodyType || 'Not specified',
       location: user.profile.location || 'Location not set',
@@ -242,10 +301,10 @@ exports.getAllProfiles = [verifyToken, async (req, res) => {
       fitnessLevel: user.profile.fitnessLevel || 'Not specified',
       workoutPreferences: user.profile.workoutPreferences || [],
       gymFrequency: user.profile.gymFrequency || 'Not specified',
-      prompts: user.profile.prompts || []
+      prompts: user.profile.prompts || [],
+      lookingFor: user.profile.lookingFor || 'Not specified'
     }));
 
-    const currentUser = await User.findById(req.userId);
     res.json({ 
       success: true, 
       profiles, 

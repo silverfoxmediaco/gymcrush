@@ -48,12 +48,14 @@ router.get('/filters', verifyToken, async (req, res) => {
     
     res.json({ 
       success: true, 
-      filters: user?.filterPreferences || {
-        minAge: 18,
-        maxAge: 100,
-        distance: 50,
-        interestedIn: 'everyone',
-        hasPhoto: false
+      filters: {
+        ageMin: user?.filterPreferences?.minAge || 18,
+        ageMax: user?.filterPreferences?.maxAge || 99,
+        distance: user?.filterPreferences?.distance || 50,
+        gender: user?.filterPreferences?.gender || [],
+        lookingFor: user?.filterPreferences?.lookingFor || [],
+        heightMin: user?.filterPreferences?.heightMin || '',
+        heightMax: user?.filterPreferences?.heightMax || '',
       }
     });
   } catch (error) {
@@ -69,17 +71,29 @@ router.get('/filters', verifyToken, async (req, res) => {
 router.put('/filters', verifyToken, async (req, res) => {
   try {
     const User = require('../models/User');
-    const { minAge, maxAge, distance, interestedIn, hasPhoto } = req.body;
+    const { 
+      ageMin, 
+      ageMax, 
+      distance, 
+      gender, 
+      lookingFor,
+      heightMin,
+      heightMax,
+      interests 
+    } = req.body;
     
     const user = await User.findByIdAndUpdate(
       req.userId,
       { 
         filterPreferences: {
-          minAge: minAge || 18,
-          maxAge: maxAge || 100,
+          minAge: ageMin || 18,
+          maxAge: ageMax || 100,
           distance: distance || 50,
-          interestedIn: interestedIn || 'everyone',
-          hasPhoto: hasPhoto || false
+          gender: gender || [],
+          lookingFor: lookingFor || [],
+          heightMin: heightMin || '',
+          heightMax: heightMax || '',
+          interests: interests || []
         }
       },
       { new: true }
@@ -99,6 +113,97 @@ router.put('/filters', verifyToken, async (req, res) => {
   }
 });
 
+// POST /api/profile/geocode - Geocode a location
+router.post('/geocode', verifyToken, async (req, res) => {
+  try {
+    const { location } = req.body;
+    
+    if (!location) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Location is required' 
+      });
+    }
+    
+    // Add a User-Agent header as required by Nominatim
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`,
+      {
+        headers: {
+          'User-Agent': 'GymCrush/1.0'
+        }
+      }
+    );
+    
+    const data = await response.json();
+    
+    if (data && data[0]) {
+      res.json({
+        success: true,
+        coordinates: [parseFloat(data[0].lon), parseFloat(data[0].lat)]
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'Location not found'
+      });
+    }
+  } catch (error) {
+    console.error('Geocoding error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to geocode location' 
+    });
+  }
+});
+
+// POST /api/profile/reverse-geocode - Reverse geocode coordinates
+router.post('/reverse-geocode', verifyToken, async (req, res) => {
+  try {
+    const { latitude, longitude } = req.body;
+    
+    if (!latitude || !longitude) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Coordinates are required' 
+      });
+    }
+    
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+      {
+        headers: {
+          'User-Agent': 'GymCrush/1.0'
+        }
+      }
+    );
+    
+    const data = await response.json();
+    
+    if (data && data.address) {
+      const city = data.address.city || data.address.town || data.address.village;
+      const state = data.address.state;
+      const displayLocation = `${city}, ${state}`;
+      
+      res.json({
+        success: true,
+        location: displayLocation
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'Could not determine location'
+      });
+    }
+  } catch (error) {
+    console.error('Reverse geocoding error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to reverse geocode' 
+    });
+  }
+});
+
 // GET /api/profile/notifications - Get notification preferences
 router.get('/notifications', verifyToken, async (req, res) => {
   try {
@@ -109,10 +214,10 @@ router.get('/notifications', verifyToken, async (req, res) => {
       success: true, 
       notifications: user?.profile?.notifications || {
         emailEnabled: true,
-        seedReceived: true,
+        crushReceived: true,
         newMessage: true,
         newMatch: true,
-        lowSeedBalance: true,
+        premiumExpiring: true,
         marketing: false
       }
     });
@@ -138,7 +243,7 @@ router.put('/notifications', verifyToken, async (req, res) => {
       });
     }
     
-    const validKeys = ['emailEnabled', 'seedReceived', 'newMessage', 'newMatch', 'lowSeedBalance', 'marketing'];
+    const validKeys = ['emailEnabled', 'crushReceived', 'newMessage', 'newMatch', 'premiumExpiring', 'marketing'];
     const providedKeys = Object.keys(notifications);
     const invalidKeys = providedKeys.filter(key => !validKeys.includes(key));
     
@@ -154,10 +259,10 @@ router.put('/notifications', verifyToken, async (req, res) => {
       { 
         'profile.notifications': {
           emailEnabled: notifications.emailEnabled !== undefined ? notifications.emailEnabled : true,
-          seedReceived: notifications.seedReceived !== undefined ? notifications.seedReceived : true,
+          crushReceived: notifications.crushReceived !== undefined ? notifications.crushReceived : true,
           newMessage: notifications.newMessage !== undefined ? notifications.newMessage : true,
           newMatch: notifications.newMatch !== undefined ? notifications.newMatch : true,
-          lowSeedBalance: notifications.lowSeedBalance !== undefined ? notifications.lowSeedBalance : true,
+          premiumExpiring: notifications.premiumExpiring !== undefined ? notifications.premiumExpiring : true,
           marketing: notifications.marketing !== undefined ? notifications.marketing : false
         }
       },

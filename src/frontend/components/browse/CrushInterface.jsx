@@ -326,8 +326,8 @@ const CrushInterface = () => {
         <div className="no-profiles-message">
           <h2>No profiles available</h2>
           <p>Check back later for new gym members.</p>
-          <button className="btn-primary" onClick={() => navigate('/gym')}>
-            Visit My Gym
+          <button className="btn-primary" onClick={() => navigate('/crushes')}>
+            Visit My Crushes
           </button>
         </div>
       </div>

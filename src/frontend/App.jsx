@@ -42,8 +42,8 @@ const LandingPage = ({ onSignupClick }) => (
       <div className="hero-overlay"></div>
       <div className="container hero-content">
         <h2 className="hero-title">
-          Where Strength<br />
-          Meets Chemistry
+         Your Gym Bae is<br />
+          Just a Crush Away
         </h2>
         <p className="hero-subtitle">
           Connect with fitness enthusiasts who share your passion for health and wellness
@@ -52,7 +52,7 @@ const LandingPage = ({ onSignupClick }) => (
           className="btn btn-primary hero-cta" 
           onClick={onSignupClick}
         >
-          Start Crushing It
+          Find Your Crush
         </button>
       </div>
     </section>
