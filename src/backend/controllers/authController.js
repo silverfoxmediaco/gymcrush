@@ -1,4 +1,4 @@
-// Updated Auth Controller with Password Reset
+// authController.js
 // Path: src/backend/controllers/authController.js
 // Purpose: Authentication controller with password reset functionality
 
@@ -25,33 +25,100 @@ exports.register = async (req, res) => {
   try {
     const { email, password, username, dateOfBirth } = req.body;
 
-    // Check if user exists
-    const existingUser = await User.findOne({
-      $or: [{ email }, { username }],
-    });
-
-    if (existingUser) {
+    // Validate required fields
+    if (!email || !password || !username || !dateOfBirth) {
       return res.status(400).json({
         success: false,
-        message: 'Email or username already exists',
+        message: 'Please provide email, password, username, and date of birth',
       });
     }
 
-    // Create user
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email',
+      });
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters',
+      });
+    }
+
+    // Validate date of birth - user must be 18+
+    const dob = new Date(dateOfBirth);
+    const today = new Date();
+    const age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
+    
+    if (age < 18) {
+      return res.status(400).json({
+        success: false,
+        message: 'You must be at least 18 years old to register',
+      });
+    }
+
+    if (age > 100) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a valid date of birth',
+      });
+    }
+
+    // Check if user exists (case-insensitive)
+    const existingUser = await User.findOne({
+      $or: [
+        { email: email.toLowerCase() }, 
+        { username: { $regex: new RegExp(`^${username}$`, 'i') } }
+      ],
+    });
+
+    if (existingUser) {
+      if (existingUser.email === email.toLowerCase()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email already registered',
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: 'Username already taken',
+        });
+      }
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create user with initial profile data
     const user = await User.create({
-      email,
-      password,
+      email: email.toLowerCase(),
+      password: hashedPassword,
       username,
-      dateOfBirth,
+      dateOfBirth: dob,
+      crushBalance: 5, // Give new users 5 free crushes
+      profile: {
+        age: age,
+        photos: [],
+        interests: [],
+        prompts: []
+      }
     });
 
     // Generate token
     const token = generateToken(user._id);
     
     // Send welcome email (optional - don't let it block registration)
-    sendWelcomeEmail(user.email, user.username).catch(err => {
-      console.error('Welcome email error:', err);
-    });
+    if (sendWelcomeEmail) {
+      sendWelcomeEmail(user.email, user.username).catch(err => {
+        console.error('Welcome email error:', err);
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -60,14 +127,17 @@ exports.register = async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
-        accountTier: user.accountTier,
+        dateOfBirth: user.dateOfBirth,
+        crushBalance: user.crushBalance,
+        age: age
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error('Registration error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error',
+      message: 'Server error during registration',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -77,15 +147,38 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user
-    const user = await User.findOne({ email }).select('+password');
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email and password',
+      });
+    }
 
-    if (!user || !(await user.comparePassword(password))) {
+    // Find user and include password field
+    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+
+    if (!user) {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials',
       });
     }
+
+    // Check password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials',
+      });
+    }
+
+    // Calculate current age from DOB
+    const today = new Date();
+    const birthDate = new Date(user.dateOfBirth);
+    const age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
 
     // Generate token
     const token = generateToken(user._id);
@@ -97,14 +190,16 @@ exports.login = async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
-        accountTier: user.accountTier,
+        dateOfBirth: user.dateOfBirth,
+        crushBalance: user.crushBalance,
+        age: age
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error('Login error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error',
+      message: 'Server error during login',
     });
   }
 };
@@ -114,11 +209,18 @@ exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide an email',
+      });
+    }
+
     // Find user by email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
-      // Don't reveal if email exists or not
+      // Don't reveal if email exists or not for security
       return res.json({
         success: true,
         message: 'If an account exists with this email, a password reset link has been sent.',
@@ -141,11 +243,13 @@ exports.forgotPassword = async (req, res) => {
     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
     // Send password reset email
-    const emailResult = await sendPasswordResetEmail(user.email, resetUrl, user.username);
-    
-    if (!emailResult.success) {
-      console.error('Failed to send password reset email:', emailResult.error);
-      // Continue anyway - user might still have the token from logs
+    try {
+      if (sendPasswordResetEmail) {
+        await sendPasswordResetEmail(user.email, resetUrl, user.username);
+      }
+    } catch (emailError) {
+      console.error('Failed to send password reset email:', emailError);
+      // Continue anyway - don't expose email failures to user
     }
 
     res.json({
@@ -171,6 +275,14 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
+    // Validate new password
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters',
+      });
+    }
+
     // Hash the token to match what's in database
     const hashedToken = crypto
       .createHash('sha256')
@@ -190,13 +302,19 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    // Update password
-    user.password = newPassword;
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     
-    // IMPORTANT: Use validateModifiedOnly to avoid photo validation issues
+    // Save user with new password
     await user.save({ validateModifiedOnly: true });
+
+    // Calculate current age from DOB
+    const today = new Date();
+    const birthDate = new Date(user.dateOfBirth);
+    const age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
 
     // Generate new auth token
     const authToken = generateToken(user._id);
@@ -209,7 +327,9 @@ exports.resetPassword = async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
-        accountTier: user.accountTier,
+        dateOfBirth: user.dateOfBirth,
+        crushBalance: user.crushBalance,
+        age: age
       },
     });
   } catch (error) {
@@ -255,6 +375,41 @@ exports.verifyResetToken = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error verifying token',
+    });
+  }
+};
+
+// Get current user
+exports.getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId)
+      .select('-password -passwordResetToken -passwordResetExpires');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    // Calculate current age from DOB
+    const today = new Date();
+    const birthDate = new Date(user.dateOfBirth);
+    const age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+
+    res.status(200).json({
+      success: true,
+      user: {
+        ...user.toObject(),
+        age: age
+      }
+    });
+
+  } catch (error) {
+    console.error('Get user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
     });
   }
 };
