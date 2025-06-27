@@ -1,6 +1,6 @@
-// Updated Profile Routes with Notification Settings
+// Updated Profile Routes with Notification Settings and Username Route
 // Path: src/backend/routes/profileRoutes.js
-// Purpose: Define profile-related API endpoints including notification preferences
+// Purpose: Define profile-related API endpoints including notification preferences and username-based profile viewing
 
 const express = require('express');
 const router = express.Router();
@@ -12,6 +12,7 @@ const {
   updatePhotoDisplayMode,
   getAllProfiles
 } = require('../controllers/profileController');
+const User = require('../models/User');
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -40,10 +41,41 @@ router.get('/', getProfile);
 // PUT /api/profile - Update current user's profile
 router.put('/', updateProfile);
 
+// GET /api/profile/user/:username - Get profile by username
+router.get('/user/:username', async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    // Find user by username (case-insensitive)
+    const user = await User.findOne({ 
+      username: { $regex: new RegExp(`^${username}$`, 'i') } 
+    })
+    .select('-password -email -resetPasswordToken -resetPasswordExpires -stripeCustomerId -stripeSubscriptionId');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      profile: user
+    });
+    
+  } catch (error) {
+    console.error('Get profile by username error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to load profile'
+    });
+  }
+});
+
 // GET /api/profile/filters - Get filter preferences
 router.get('/filters', verifyToken, async (req, res) => {
   try {
-    const User = require('../models/User');
     const user = await User.findById(req.userId).select('filterPreferences');
     
     res.json({ 
@@ -70,7 +102,6 @@ router.get('/filters', verifyToken, async (req, res) => {
 // PUT /api/profile/filters - Update filter preferences
 router.put('/filters', verifyToken, async (req, res) => {
   try {
-    const User = require('../models/User');
     const { 
       ageMin, 
       ageMax, 
@@ -207,7 +238,6 @@ router.post('/reverse-geocode', verifyToken, async (req, res) => {
 // GET /api/profile/notifications - Get notification preferences
 router.get('/notifications', verifyToken, async (req, res) => {
   try {
-    const User = require('../models/User');
     const user = await User.findById(req.userId).select('profile.notifications');
     
     res.json({ 
@@ -233,7 +263,6 @@ router.get('/notifications', verifyToken, async (req, res) => {
 // PUT /api/profile/notifications - Update notification preferences
 router.put('/notifications', verifyToken, async (req, res) => {
   try {
-    const User = require('../models/User');
     const { notifications } = req.body;
     
     if (!notifications) {
