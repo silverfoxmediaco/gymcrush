@@ -7,10 +7,10 @@ const router = express.Router();
 const { getCrushes, getCrushData } = require('../controllers/crushController');
 const crushAccountController = require('../controllers/crushAccountController');
 
-// GET /api/crushes - Get user's crushes data (sent/received/matches)
+// GET /api/crushes - Get user's crushes data
 router.get('/', getCrushes);
 
-// GET /api/crushes/data - Get user's crush balance and history
+// GET /api/crushes/data - Get crush balance and history
 router.get('/data', getCrushData);
 
 // Payment and subscription routes
