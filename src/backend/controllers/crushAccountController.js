@@ -371,7 +371,9 @@ exports.handleStripeWebhook = async (req, res) => {
          
          await User.findByIdAndUpdate(userId, {
            accountTier: 'unlimited',
-           'crushes.available': 999999, // Symbolic for unlimited
+           crushBalance: 999999, // Changed from 'crushes.available' to 'crushBalance'
+           hasActiveSubscription: true,
+           subscriptionEndDate: new Date(subscription.current_period_end * 1000),
            subscription: {
              stripeSubscriptionId: subscription.id,
              stripeCustomerId: subscription.customer,
@@ -410,7 +412,7 @@ exports.handleStripeWebhook = async (req, res) => {
          
          const user = await User.findByIdAndUpdate(
            userId,
-           { $inc: { 'crushes.available': crushCount } },
+           { $inc: { crushBalance: crushCount } }, // Changed from 'crushes.available' to 'crushBalance'
            { new: true }
          );
          
@@ -424,7 +426,7 @@ exports.handleStripeWebhook = async (req, res) => {
            type: 'purchased',
            amount: crushCount,
            change: crushCount,
-           balanceAfter: user.crushes.available,
+           balanceAfter: user.crushBalance, // Changed from user.crushes.available
            description: `Purchased ${crushCount} crushes - ${packageId} pack`,
            stripeSessionId: session.id,
            paymentAmount: session.amount_total / 100
@@ -447,7 +449,9 @@ exports.handleStripeWebhook = async (req, res) => {
          {
            'subscription.status': subscription.status,
            'subscription.currentPeriodEnd': new Date(subscription.current_period_end * 1000),
-           'subscription.cancelAtPeriodEnd': subscription.cancel_at_period_end
+           'subscription.cancelAtPeriodEnd': subscription.cancel_at_period_end,
+           hasActiveSubscription: subscription.status === 'active',
+           subscriptionEndDate: new Date(subscription.current_period_end * 1000)
          },
          { new: true }
        );
@@ -486,6 +490,7 @@ exports.handleStripeWebhook = async (req, res) => {
          { stripeCustomerId: deletedSubscription.customer },
          {
            accountTier: 'free',
+           hasActiveSubscription: false,
            'subscription.status': 'cancelled',
            'subscription.cancelledAt': new Date()
          },
