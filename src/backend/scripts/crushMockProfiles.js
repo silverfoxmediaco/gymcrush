@@ -15,6 +15,7 @@ const mockProfiles = [
     password: 'password123',
     username: 'FitnessFiona',
     dateOfBirth: new Date('1996-03-15'),
+    crushBalance: 5,
     profile: {
       age: 28,
       height: "5'6\"",
@@ -50,6 +51,7 @@ const mockProfiles = [
     password: 'password123',
     username: 'YogaYara',
     dateOfBirth: new Date('1992-07-22'),
+    crushBalance: 5,
     profile: {
       age: 32,
       height: "5'4\"",
@@ -85,6 +87,7 @@ const mockProfiles = [
     password: 'password123',
     username: 'CrossfitCara',
     dateOfBirth: new Date('1994-11-30'),
+    crushBalance: 5,
     profile: {
       age: 30,
       height: "5'7\"",
@@ -120,6 +123,7 @@ const mockProfiles = [
     password: 'password123',
     username: 'SpinningSarah',
     dateOfBirth: new Date('1995-02-14'),
+    crushBalance: 5,
     profile: {
       age: 29,
       height: "5'3\"",
@@ -155,6 +159,7 @@ const mockProfiles = [
     password: 'password123',
     username: 'PowerlifterPam',
     dateOfBirth: new Date('1993-08-05'),
+    crushBalance: 5,
     profile: {
       age: 31,
       height: "5'5\"",
@@ -190,6 +195,7 @@ const mockProfiles = [
     password: 'password123',
     username: 'TrailRunnerTina',
     dateOfBirth: new Date('1991-05-18'),
+    crushBalance: 5,
     profile: {
       age: 33,
       height: "5'8\"",
@@ -225,6 +231,7 @@ const mockProfiles = [
     password: 'password123',
     username: 'BoxingBella',
     dateOfBirth: new Date('1990-12-03'),
+    crushBalance: 5,
     profile: {
       age: 34,
       height: "5'9\"",
@@ -260,6 +267,7 @@ const mockProfiles = [
     password: 'password123',
     username: 'DancerDiana',
     dateOfBirth: new Date('1996-09-27'),
+    crushBalance: 5,
     profile: {
       age: 28,
       height: "5'2\"",
@@ -295,6 +303,7 @@ const mockProfiles = [
     password: 'password123',
     username: 'GymGuyMarcus',
     dateOfBirth: new Date('1992-04-15'),
+    crushBalance: 5,
     profile: {
       age: 32,
       height: "6'1\"",
@@ -330,6 +339,7 @@ const mockProfiles = [
     password: 'password123',
     username: 'FitDavid',
     dateOfBirth: new Date('1994-09-22'),
+    crushBalance: 5,
     profile: {
       age: 30,
       height: "5'10\"",
@@ -362,7 +372,7 @@ const mockProfiles = [
   }
 ];
 
-async function seedDatabase() {
+async function crushDatabase() {
   try {
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGODB_URI);
@@ -388,13 +398,13 @@ async function seedDatabase() {
       }
     }
 
-    console.log(`\nSeeding complete!`);
+    console.log(`\nCrush profiles complete!`);
     console.log(`Created: ${created} users`);
     console.log(`Skipped: ${skipped} existing users`);
     console.log(`Total: ${mockProfiles.length} users in database`);
 
   } catch (error) {
-    console.error('Error seeding database:', error);
+    console.error('Error creating crush profiles:', error);
   } finally {
     // Close the connection
     await mongoose.connection.close();
@@ -402,5 +412,5 @@ async function seedDatabase() {
   }
 }
 
-// Run the seeding function
-seedDatabase();
+// Run the crush profiles function
+crushDatabase();

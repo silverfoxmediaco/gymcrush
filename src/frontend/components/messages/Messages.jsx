@@ -21,7 +21,7 @@ const Messages = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
-  const [userSeeds, setUserSeeds] = useState(0);
+  const [userCrushes, setUserCrushes] = useState(0);
   const [hasSubscription, setHasSubscription] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -36,7 +36,7 @@ const Messages = () => {
     const token = localStorage.getItem('token');
     const serverUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:5000' 
-      : 'https://www.wallflower.me';
+      : window.location.origin;
     
     const newSocket = io(serverUrl, {
       auth: { token }
@@ -91,17 +91,17 @@ const Messages = () => {
     const fetchMatches = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('/api/garden', {
+        const response = await fetch('/api/crushes', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         const data = await response.json();
-        console.log('Direct garden fetch:', data);
+        console.log('Direct crushes fetch:', data);
         
-        if (data.success && data.garden && data.garden.matches) {
-          console.log('Setting matches:', data.garden.matches);
-          setNewMatches(data.garden.matches);
+        if (data.success && data.crushes && data.crushes.matches) {
+          console.log('Setting matches:', data.crushes.matches);
+          setNewMatches(data.crushes.matches);
         }
       } catch (error) {
         console.error('Error fetching matches:', error);
@@ -109,7 +109,7 @@ const Messages = () => {
     };
     
     fetchMatches();
-    loadUserSeeds();
+    loadUserCrushes();
   }, []);
 
   // If userId is in URL, load that conversation
@@ -164,10 +164,10 @@ const Messages = () => {
     }
   };
 
-  const loadUserSeeds = async () => {
+  const loadUserCrushes = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/seeds/data', {
+      const response = await fetch('/api/crushes/data', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -175,18 +175,18 @@ const Messages = () => {
 
       const data = await response.json();
       if (data.success) {
-        setUserSeeds(data.balance);
+        setUserCrushes(data.balance);
         setHasSubscription(data.hasActiveSubscription);
       }
     } catch (error) {
-      console.error('Error loading seeds:', error);
+      console.error('Error loading crushes:', error);
     }
   };
 
   const loadNewMatches = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/garden', {
+      const response = await fetch('/api/crushes', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -337,8 +337,8 @@ const Messages = () => {
   const sendImage = async () => {
     if (!selectedImage || imageUploading) return;
 
-    if (!hasSubscription && userSeeds < 1) {
-      alert('You need 1 seed to send an image. Please purchase more seeds.');
+    if (!hasSubscription && userCrushes < 1) {
+      alert('You need 1 crush to send an image. Please purchase more crushes.');
       setShowImageModal(false);
       return;
     }
@@ -368,7 +368,7 @@ const Messages = () => {
       
       if (data.success) {
         setMessages(prev => [...prev, data.message]);
-        setUserSeeds(data.remainingSeeds);
+        setUserCrushes(data.remainingCrushes);
         updateConversationList();
         setShowImageModal(false);
         setSelectedImage(null);
@@ -551,7 +551,7 @@ const Messages = () => {
             <div className="messages-area">
               {messages.length === 0 ? (
                 <div className="empty-messages">
-                  <div className="empty-icon">🌸</div>
+                  <div className="empty-icon">💪</div>
                   <p>Say hello to {selectedUser.username}!</p>
                   <span>Start your conversation with a thoughtful message</span>
                 </div>
@@ -654,15 +654,15 @@ const Messages = () => {
               <img src={imagePreview} alt="Preview" />
             </div>
             
-            <div className="seed-info">
+            <div className="crush-info">
               {hasSubscription ? (
                 <p className="subscription-info">
                   ✨ Unlimited member - Send free!
                 </p>
               ) : (
-                <p className="seed-cost">
-                  This will cost 1 seed 
-                  <span className="seed-balance">(You have {userSeeds} seeds)</span>
+                <p className="crush-cost">
+                  This will cost 1 crush 
+                  <span className="crush-balance">(You have {userCrushes} crushes)</span>
                 </p>
               )}
             </div>
@@ -681,7 +681,7 @@ const Messages = () => {
               <button 
                 className="send-image-button" 
                 onClick={sendImage}
-                disabled={imageUploading || (!hasSubscription && userSeeds < 1)}
+                disabled={imageUploading || (!hasSubscription && userCrushes < 1)}
               >
                 {imageUploading ? 'Sending...' : 'Send Image'}
               </button>

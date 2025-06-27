@@ -115,7 +115,7 @@ const Contact = () => {
       <div className="contact-header">
         <h1>Get in Touch</h1>
         <p className="contact-subtitle">
-          We're here to help make your Wallflower experience bloom
+          We're here to help make your GymCrush experience amazing
         </p>
       </div>
 
@@ -141,10 +141,10 @@ const Contact = () => {
                 </div>
               </div>
               <div className="topic-item">
-                <span className="topic-icon">🌱</span>
+                <span className="topic-icon">🔥</span>
                 <div>
-                  <h4>Seeds & Matching</h4>
-                  <p>Questions about how seeds work or matching issues</p>
+                  <h4>Crushes & Matching</h4>
+                  <p>Questions about how crushes work or matching issues</p>
                 </div>
               </div>
               <div className="topic-item">
@@ -158,7 +158,7 @@ const Contact = () => {
                 <span className="topic-icon">💡</span>
                 <div>
                   <h4>Suggestions</h4>
-                  <p>Share ideas to help Wallflower grow better</p>
+                  <p>Share ideas to help GymCrush grow stronger</p>
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 /* Messages Component Styles
    Path: src/frontend/components/messages/Message.css
-   Purpose: Styling for the messaging interface with Wallflower aesthetic */
+   Purpose: Styling for the messaging interface with GymCrush aesthetic */
 
    .messages-container {
     height: calc(100vh - 80px); /* Adjust based on header height */
@@ -611,7 +611,7 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
   
-  .seed-info {
+  .crush-info {
     background: var(--color-background);
     padding: var(--space-md);
     border-radius: 12px;
@@ -619,13 +619,13 @@
     text-align: center;
   }
   
-  .seed-cost {
+  .crush-cost {
     font-weight: 500;
     color: var(--color-text-primary);
     margin: 0;
   }
   
-  .seed-balance {
+  .crush-balance {
     display: block;
     font-size: 0.875rem;
     color: var(--color-text-muted);
