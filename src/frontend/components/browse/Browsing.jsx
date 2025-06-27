@@ -1,24 +1,18 @@
 // Browsing Component
 // Path: src/frontend/components/browse/Browsing.jsx
-// Purpose: Main browsing interface with swipeable cards and action buttons
+// Purpose: Main browsing interface - FIXED VERSION WITHOUT NEW COMPONENTS
 
 import React, { useState, useEffect } from 'react';
-import ProfileCard from './ProfileCard';
-import NoMoreProfiles from './NoMoreProfiles';
-import MatchModal from './MatchModal';
-import SuperCrushAnimation from './SuperCrushAnimation';
 import './Browsing.css';
 
 const Browsing = () => {
   const [profiles, setProfiles] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [showMatch, setShowMatch] = useState(false);
-  const [matchedUser, setMatchedUser] = useState(null);
-  const [showSuperCrush, setShowSuperCrush] = useState(false);
   const [crushBalance, setCrushBalance] = useState(0);
   const [hasSubscription, setHasSubscription] = useState(false);
   const [sendingCrush, setSendingCrush] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   useEffect(() => {
     loadProfiles();
@@ -68,7 +62,7 @@ const Browsing = () => {
     }
   };
 
-  const handleSendCrush = async (userId, isSuperCrush = false) => {
+  const handleSendCrush = async (userId) => {
     if (sendingCrush) return;
     
     // Check if user has crushes available
@@ -88,23 +82,17 @@ const Browsing = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ 
-          recipientId: userId,
-          isSuperCrush: isSuperCrush 
+          recipientId: userId
         })
       });
 
       const data = await response.json();
       
       if (data.success) {
-        if (isSuperCrush) {
-          setShowSuperCrush(true);
-          setTimeout(() => setShowSuperCrush(false), 3000);
-        }
-
         if (data.isMatch) {
-          const matchedProfile = profiles[currentIndex];
-          setMatchedUser(matchedProfile);
-          setShowMatch(true);
+          alert("It's a match! 💪❤️ Check your messages!");
+        } else {
+          alert('Crush sent successfully! 💪');
         }
 
         // Update crush balance if not unlimited
@@ -117,8 +105,6 @@ const Browsing = () => {
       } else {
         if (data.needsCrushes) {
           alert('You need crushes to send! Click on your profile to purchase more or get unlimited access.');
-          // Optionally redirect to profile
-          // window.location.href = '/profile';
         } else {
           alert(data.message || 'Failed to send crush');
         }
@@ -132,6 +118,7 @@ const Browsing = () => {
   };
 
   const handleNext = () => {
+    setCurrentPhotoIndex(0); // Reset photo index for new profile
     if (currentIndex < profiles.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
@@ -146,16 +133,21 @@ const Browsing = () => {
   };
 
   const handleRewind = () => {
+    setCurrentPhotoIndex(0); // Reset photo index
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     }
   };
 
-  const handleRefresh = () => {
-    setLoading(true);
-    setCurrentIndex(0);
-    loadProfiles();
-    loadCrushBalance();
+  const handlePhotoNav = (direction) => {
+    const currentProfile = profiles[currentIndex];
+    if (!currentProfile || !currentProfile.photos) return;
+
+    if (direction === 'next' && currentPhotoIndex < currentProfile.photos.length - 1) {
+      setCurrentPhotoIndex(currentPhotoIndex + 1);
+    } else if (direction === 'prev' && currentPhotoIndex > 0) {
+      setCurrentPhotoIndex(currentPhotoIndex - 1);
+    }
   };
 
   if (loading) {
@@ -170,10 +162,27 @@ const Browsing = () => {
   }
 
   if (profiles.length === 0 || currentIndex >= profiles.length) {
-    return <NoMoreProfiles onRefresh={handleRefresh} />;
+    return (
+      <div className="browsing-container">
+        <div className="no-more-profiles">
+          <div className="no-more-content">
+            <h2>No more profiles!</h2>
+            <p>Check back later or adjust your preferences.</p>
+            <button onClick={() => {
+              setLoading(true);
+              setCurrentIndex(0);
+              loadProfiles();
+            }}>
+              Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const currentProfile = profiles[currentIndex];
+  const currentPhoto = currentProfile.photos && currentProfile.photos[currentPhotoIndex];
 
   return (
     <div className="browsing-container">
@@ -194,13 +203,86 @@ const Browsing = () => {
         </div>
       </div>
 
-      <div className="cards-container">
-        <ProfileCard 
-          profile={currentProfile}
-          onCrush={() => handleSendCrush(currentProfile.id)}
-          onSkip={handleSkip}
-          isLoading={sendingCrush}
-        />
+      <div className="profile-card">
+        <div className="profile-card-image-container">
+          {currentProfile.photos && currentProfile.photos.length > 0 ? (
+            <>
+              <img 
+                src={currentPhoto?.url || currentPhoto?.thumbnailUrl} 
+                alt={currentProfile.username}
+                className="profile-card-image"
+              />
+              {currentProfile.photos.length > 1 && (
+                <>
+                  <div className="photo-indicators">
+                    {currentProfile.photos.map((_, index) => (
+                      <span 
+                        key={index} 
+                        className={`indicator ${index === currentPhotoIndex ? 'active' : ''}`}
+                      />
+                    ))}
+                  </div>
+                  <button 
+                    className="photo-nav photo-nav-prev" 
+                    onClick={() => handlePhotoNav('prev')}
+                    disabled={currentPhotoIndex === 0}
+                  >
+                    ‹
+                  </button>
+                  <button 
+                    className="photo-nav photo-nav-next" 
+                    onClick={() => handlePhotoNav('next')}
+                    disabled={currentPhotoIndex === currentProfile.photos.length - 1}
+                  >
+                    ›
+                  </button>
+                </>
+              )}
+            </>
+          ) : (
+            <div className="no-photo-placeholder">
+              <span className="placeholder-icon">💪</span>
+            </div>
+          )}
+        </div>
+
+        <div className="profile-info">
+          <h2>{currentProfile.username}, {currentProfile.age}</h2>
+          <p className="location">{currentProfile.location}</p>
+          
+          {currentProfile.bio && (
+            <div className="bio-section">
+              <h3>About</h3>
+              <p>{currentProfile.bio}</p>
+            </div>
+          )}
+          
+          {currentProfile.interests && currentProfile.interests.length > 0 && (
+            <div className="interests-section">
+              <h3>Interests</h3>
+              <div className="interests-grid">
+                {currentProfile.interests.map((interest, index) => (
+                  <span key={index} className="interest-chip">{interest}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="profile-details">
+            <div className="detail-item">
+              <span className="label">Height:</span>
+              <span className="value">{currentProfile.height || 'Not specified'}</span>
+            </div>
+            <div className="detail-item">
+              <span className="label">Body Type:</span>
+              <span className="value">{currentProfile.bodyType || 'Not specified'}</span>
+            </div>
+            <div className="detail-item">
+              <span className="label">Looking For:</span>
+              <span className="value">{currentProfile.lookingFor || 'Not specified'}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="action-buttons">
@@ -230,28 +312,7 @@ const Browsing = () => {
         >
           <span className="icon">💪</span>
         </button>
-        
-        <button 
-          className="action-btn super-crush-btn" 
-          onClick={() => handleSendCrush(currentProfile.id, true)}
-          disabled={sendingCrush || (!hasSubscription && crushBalance <= 0)}
-          title="Super Crush!"
-        >
-          <span className="icon">⚡</span>
-        </button>
       </div>
-
-      {showMatch && matchedUser && (
-        <MatchModal 
-          user={matchedUser} 
-          onClose={() => {
-            setShowMatch(false);
-            setMatchedUser(null);
-          }} 
-        />
-      )}
-
-      {showSuperCrush && <SuperCrushAnimation />}
     </div>
   );
 };
