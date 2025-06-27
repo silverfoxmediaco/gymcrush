@@ -4,15 +4,18 @@
 
 const express = require('express');
 const router = express.Router();
-const { getCrushes } = require('../controllers/crushController');
+const { getCrushes, getCrushData } = require('../controllers/crushController');
 const crushAccountController = require('../controllers/crushAccountController');
 
-// GET /api/crushes - Get user's crushes data
+// GET /api/crushes - Get user's crushes data (sent/received/matches)
 router.get('/', getCrushes);
+
+// GET /api/crushes/data - Get user's crush balance and history
+router.get('/data', getCrushData);
 
 // Payment and subscription routes
 router.post('/create-checkout', crushAccountController.createCheckoutSession);
-router.post('/subscription', crushAccountController.createSubscription);
+router.post('/create-subscription', crushAccountController.createSubscription);
 router.post('/cancel-subscription', crushAccountController.cancelSubscription);
 router.get('/account-data', crushAccountController.getAccountData);
 router.get('/purchase-history', crushAccountController.getPurchaseHistory);
