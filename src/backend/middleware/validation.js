@@ -52,7 +52,7 @@ const customValidators = {
     }
     
     if (age < 18) {
-      throw new Error('Must be 18 or older to use Wallflower');
+      throw new Error('Must be 18 or older to use GymCrush');
     }
     
     return true;
@@ -68,7 +68,7 @@ const customValidators = {
     }
     
     // Check for inappropriate words (add more as needed)
-    const bannedWords = ['admin', 'wallflower', 'moderator', 'support'];
+    const bannedWords = ['admin', 'gymcrush', 'moderator', 'support'];
     const lowerUsername = username.toLowerCase();
     
     if (bannedWords.some(word => lowerUsername.includes(word))) {

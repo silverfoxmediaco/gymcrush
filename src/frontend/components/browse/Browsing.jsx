@@ -37,7 +37,7 @@ const Browsing = () => {
 
       if (data.success) {
         setProfiles(data.profiles);
-        setCrushesRemaining(data.seedsRemaining);
+        setCrushesRemaining(data.crushesRemaining);
         setLoading(false);
       } else {
         setError(data.message);
@@ -64,7 +64,7 @@ const Browsing = () => {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch('/api/match/send-seed', {
+      const response = await fetch('/api/match/send-crush', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ const Browsing = () => {
       const data = await response.json();
 
       if (data.success) {
-        setCrushesRemaining(data.seedsRemaining);
+        setCrushesRemaining(data.crushesRemaining);
         setSentCrushes(prev => new Set([...prev, profileId]));
       } else {
         alert(data.message);

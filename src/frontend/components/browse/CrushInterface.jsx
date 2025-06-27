@@ -52,7 +52,7 @@ const CrushInterface = () => {
 
       if (data.success) {
         setProfiles(data.profiles);
-        setCrushesRemaining(data.seedsRemaining);
+        setCrushesRemaining(data.crushesRemaining);
         setLoading(false);
       } else {
         setError(data.message);
@@ -212,7 +212,7 @@ const CrushInterface = () => {
         const token = localStorage.getItem('token');
         const currentProfile = profiles[currentProfileIndex];
 
-        const response = await fetch('/api/match/send-seed', {
+        const response = await fetch('/api/match/send-crush', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -226,7 +226,7 @@ const CrushInterface = () => {
         const data = await response.json();
 
         if (data.success) {
-          setCrushesRemaining(data.seedsRemaining);
+          setCrushesRemaining(data.crushesRemaining);
           moveToNextProfile();
         } else {
           alert(data.message);
