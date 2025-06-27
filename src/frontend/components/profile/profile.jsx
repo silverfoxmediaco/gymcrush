@@ -521,7 +521,6 @@ const Profile = () => {
                 <option value="">Select gender</option>
                 <option value="Man">Man</option>
                 <option value="Woman">Woman</option>
-                <option value="Non-binary">Non-binary</option>
               </select>
             </div>
 
