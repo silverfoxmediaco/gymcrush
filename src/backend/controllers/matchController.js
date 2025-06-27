@@ -1,4 +1,4 @@
-// Updated Match Controller with Notifications
+// Updated Match Controller with Notifications and Crush Balance Check
 // Path: src/backend/controllers/matchController.js
 // Purpose: Handle matching/browsing functionality with email notifications
 
@@ -77,7 +77,9 @@ exports.getBrowseProfiles = [verifyToken, async (req, res) => {
     res.json({
       success: true,
       profiles: formattedProfiles,
-      accountTier: currentUser.accountTier
+      accountTier: currentUser.accountTier,
+      crushBalance: Math.max(0, currentUser.crushBalance || 0),
+      hasActiveSubscription: currentUser.subscription?.status === 'active'
     });
   } catch (error) {
     console.error('Browse profiles error:', error);
@@ -91,23 +93,26 @@ exports.sendCrush = [verifyToken, async (req, res) => {
     const { recipientId } = req.body;
 
     const sender = await User.findById(req.userId);
-    const recipient = await User.findById(recipientId);
 
-    if (!sender || !recipient) {
+    if (!sender) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
 
-    // Check if user has crushes available (if not unlimited)
+    // Check if user has crushes available or active subscription
     const hasActiveSubscription = sender.subscription?.status === 'active' && 
-      sender.subscription?.currentPeriodEnd > new Date();
+                                 sender.subscription?.currentPeriodEnd > new Date();
     
-    if (!hasActiveSubscription && sender.crushBalance <= 0) {
+    const currentBalance = sender.crushBalance || 0;
+    
+    if (!hasActiveSubscription && currentBalance <= 0) {
       return res.status(400).json({
         success: false,
-        message: 'No crushes available. Please purchase more crushes.'
+        message: 'You need crushes to send. Please purchase more crushes or subscribe for unlimited!',
+        needsCrushes: true,
+        balance: 0
       });
     }
 
@@ -123,67 +128,92 @@ exports.sendCrush = [verifyToken, async (req, res) => {
       });
     }
 
+    // Check if recipient exists
+    const recipient = await User.findById(recipientId);
+    if (!recipient) {
+      return res.status(404).json({
+        success: false,
+        message: 'Recipient not found'
+      });
+    }
+
     // Check if recipient already sent a crush to sender (for match detection)
     const recipientSentToSender = recipient.crushes.sent.some(
       crush => crush.to.toString() === req.userId
     );
 
-    // Update sender: add to sent list and decrease crush balance
-    const updateData = {
-      $push: {
-        'crushes.sent': {
-          to: recipientId,
-          sentAt: new Date()
+    // Start transaction to ensure data consistency
+    const session = await User.startSession();
+    session.startTransaction();
+
+    try {
+      // Update sender: add to sent list and decrease crush balance if not unlimited
+      const updateData = {
+        $push: {
+          'crushes.sent': {
+            to: recipientId,
+            sentAt: new Date()
+          }
         }
+      };
+
+      // Only decrease crush balance if user doesn't have active subscription
+      if (!hasActiveSubscription) {
+        updateData.$inc = { crushBalance: -1 };
       }
-    };
 
-    // Only decrease balance if not unlimited
-    if (!hasActiveSubscription) {
-      updateData.$inc = { crushBalance: -1 };
-    }
+      const updatedSender = await User.findByIdAndUpdate(
+        req.userId,
+        updateData,
+        { new: true, session }
+      );
 
-    await User.findByIdAndUpdate(req.userId, updateData, { new: true });
-
-    // Update recipient: add to received list
-    await User.findByIdAndUpdate(recipientId, {
-      $push: {
-        'crushes.received': {
-          from: req.userId,
-          receivedAt: new Date()
+      // Update recipient: add to received list
+      await User.findByIdAndUpdate(recipientId, {
+        $push: {
+          'crushes.received': {
+            from: req.userId,
+            receivedAt: new Date()
+          }
         }
-      }
-    });
+      }, { session });
 
-    // Create transaction record
-    await CrushTransaction.create({
-      userId: req.userId,
-      type: 'sent',
-      amount: 1,
-      change: -1,
-      balanceAfter: hasActiveSubscription ? 999999 : sender.crushBalance - 1,
-      description: `Sent crush to ${recipient.username}`,
-      metadata: {
+      // Create transaction record
+      await CrushTransaction.create([{
+        userId: req.userId,
+        type: 'sent',
+        action: 'sent',
+        amount: 1,
+        change: -1,
+        balanceAfter: hasActiveSubscription ? 999999 : Math.max(0, updatedSender.crushBalance),
         recipientId: recipientId,
-        recipientName: recipient.username
+        recipientName: recipient.username,
+        description: `Sent crush to ${recipient.username}`
+      }], { session });
+
+      await session.commitTransaction();
+
+      // Send notifications (outside of transaction)
+      if (recipientSentToSender) {
+        // It's a match! Send match notifications to both users
+        await notificationService.sendMatchNotification(req.userId, recipientId);
+      } else {
+        // Just send crush received notification to recipient
+        await notificationService.sendCrushReceivedNotification(req.userId, recipientId);
       }
-    });
 
-    // Send notifications
-    if (recipientSentToSender) {
-      // It's a match! Send match notifications to both users
-      await notificationService.sendMatchNotification(req.userId, recipientId);
-    } else {
-      // Just send crush received notification to recipient
-      await notificationService.sendCrushReceivedNotification(req.userId, recipientId);
+      res.json({
+        success: true,
+        message: recipientSentToSender ? 'It\'s a match! 💪🔥' : 'Crush sent successfully!',
+        isMatch: recipientSentToSender,
+        remainingCrushes: hasActiveSubscription ? 'unlimited' : Math.max(0, updatedSender.crushBalance)
+      });
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
     }
-
-    res.json({
-      success: true,
-      message: recipientSentToSender ? 'It\'s a match! 💪🔥' : 'Crush sent successfully!',
-      isMatch: recipientSentToSender,
-      remainingCrushes: hasActiveSubscription ? 'unlimited' : sender.crushBalance - 1
-    });
   } catch (error) {
     console.error('Send crush error:', error);
     res.status(500).json({ success: false, message: 'Server error' });

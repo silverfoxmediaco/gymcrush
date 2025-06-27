@@ -23,13 +23,16 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Get user's crush data
+// Get user's crush data including balance
 exports.getCrushes = [verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found' 
+      });
     }
     
     // Get users who sent crushes to current user
@@ -69,7 +72,7 @@ exports.getCrushes = [verifyToken, async (req, res) => {
     // For now, this is empty until messaging is fully implemented
     const activeConnections = [];
     
-    // Return all data - note the key name change from crushData to crushes
+    // Return all data
     res.json({
       success: true,
       crushes: {
@@ -88,62 +91,91 @@ exports.getCrushes = [verifyToken, async (req, res) => {
   }
 }];
 
-// Get user's crush balance and transaction history
+// Get crush data including balance and history
 exports.getCrushData = [verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found' 
+      });
     }
     
-    // Get crush transactions
-    const history = await CrushTransaction.find({ 
-      userId: req.userId,
-      type: { $in: ['purchased', 'sent', 'received', 'bonus', 'refund'] }
-    })
-    .sort({ createdAt: -1 })
-    .limit(20);
+    // Get crush balance - ensure it's never negative
+    const balance = Math.max(0, user.crushBalance || 0);
     
-    // Format history
-    const formattedHistory = history.map(transaction => {
-      let action = transaction.type;
-      let recipientName = '';
-      let senderName = '';
-      
-      // Get names from metadata if available
-      if (transaction.metadata) {
-        recipientName = transaction.metadata.recipientName || '';
-        senderName = transaction.metadata.senderName || '';
-      }
-      
-      return {
-        _id: transaction._id,
-        action: action,
-        amount: transaction.amount || 0,
-        change: transaction.change || 0,
-        createdAt: transaction.createdAt,
-        recipientName: recipientName,
-        senderName: senderName
-      };
-    });
+    // Get transaction history
+    const history = await CrushTransaction.find({ userId: req.userId })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .populate('recipientId', 'username')
+      .populate('senderId', 'username');
     
-    // Check subscription status
+    // Check for active subscription
     const hasActiveSubscription = user.subscription?.status === 'active' && 
-      user.subscription?.currentPeriodEnd > new Date();
+                                 user.subscription?.currentPeriodEnd > new Date();
     
     res.json({
       success: true,
-      balance: user.crushBalance || 0,
-      history: formattedHistory,
+      balance: balance,
+      history: history,
       hasActiveSubscription: hasActiveSubscription,
-      subscriptionEndDate: user.subscription?.currentPeriodEnd || null
+      subscriptionEndDate: user.subscription?.currentPeriodEnd
     });
   } catch (error) {
     console.error('Get crush data error:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Failed to retrieve crush data' 
+    });
+  }
+}];
+
+// Create Stripe checkout session for crush packages
+exports.createCheckoutSession = [verifyToken, async (req, res) => {
+  try {
+    const { packageId, crushes, amount } = req.body;
+    
+    // Forward to crushAccountController
+    const crushAccountController = require('./crushAccountController');
+    return crushAccountController.createCheckoutSession[1](req, res);
+  } catch (error) {
+    console.error('Create checkout session error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to create checkout session' 
+    });
+  }
+}];
+
+// Create subscription
+exports.createSubscription = [verifyToken, async (req, res) => {
+  try {
+    // Forward to crushAccountController
+    const crushAccountController = require('./crushAccountController');
+    return crushAccountController.createSubscription[1](req, res);
+  } catch (error) {
+    console.error('Create subscription error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to create subscription' 
+    });
+  }
+}];
+
+// Cancel subscription
+exports.cancelSubscription = [verifyToken, async (req, res) => {
+  try {
+    // Forward to crushAccountController
+    const crushAccountController = require('./crushAccountController');
+    return crushAccountController.cancelSubscription[1](req, res);
+  } catch (error) {
+    console.error('Cancel subscription error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to cancel subscription' 
     });
   }
 }];

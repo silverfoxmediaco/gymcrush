@@ -1,190 +1,257 @@
 // Browsing Component
 // Path: src/frontend/components/browse/Browsing.jsx
-// Purpose: Browse all profiles in a responsive grid layout
+// Purpose: Main browsing interface with swipeable cards and action buttons
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Footer from '../Footer';
+import ProfileCard from './ProfileCard';
+import NoMoreProfiles from './NoMoreProfiles';
+import MatchModal from './MatchModal';
+import SuperCrushAnimation from './SuperCrushAnimation';
 import './Browsing.css';
 
 const Browsing = () => {
   const [profiles, setProfiles] = useState([]);
-  const [crushesRemaining, setCrushesRemaining] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [sentCrushes, setSentCrushes] = useState(new Set());
-  const navigate = useNavigate();
+  const [showMatch, setShowMatch] = useState(false);
+  const [matchedUser, setMatchedUser] = useState(null);
+  const [showSuperCrush, setShowSuperCrush] = useState(false);
+  const [crushBalance, setCrushBalance] = useState(0);
+  const [hasSubscription, setHasSubscription] = useState(false);
+  const [sendingCrush, setSendingCrush] = useState(false);
 
   useEffect(() => {
-    fetchProfiles();
+    loadProfiles();
+    loadCrushBalance();
   }, []);
 
-  const fetchProfiles = async () => {
+  const loadProfiles = async () => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/');
-        return;
-      }
-
-      const response = await fetch('/api/profile/all', {
+      const response = await fetch('/api/match/browse', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
       const data = await response.json();
-
-      if (data.success) {
+      if (data.success && data.profiles) {
         setProfiles(data.profiles);
-        setCrushesRemaining(data.crushesRemaining);
-        setLoading(false);
+        setCrushBalance(data.crushBalance || 0);
+        setHasSubscription(data.hasActiveSubscription || false);
       } else {
-        setError(data.message);
-        setLoading(false);
+        console.error('Failed to load profiles:', data.message);
       }
     } catch (error) {
-      console.error('Fetch profiles error:', error);
-      setError('Failed to load profiles');
+      console.error('Error loading profiles:', error);
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleSendCrush = async (profileId) => {
-    if (crushesRemaining === 0) {
-      alert('You\'re out of crushes! Visit your profile to get more.');
+  const loadCrushBalance = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/crushes/data', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setCrushBalance(data.balance || 0);
+        setHasSubscription(data.hasActiveSubscription || false);
+      }
+    } catch (error) {
+      console.error('Error loading crush balance:', error);
+    }
+  };
+
+  const handleSendCrush = async (userId, isSuperCrush = false) => {
+    if (sendingCrush) return;
+    
+    // Check if user has crushes available
+    if (!hasSubscription && crushBalance <= 0) {
+      alert('You need crushes to send! Click on your profile to purchase more or get unlimited access.');
       return;
     }
 
-    if (sentCrushes.has(profileId)) {
-      alert('You\'ve already sent a crush to this person.');
-      return;
-    }
+    setSendingCrush(true);
 
     try {
       const token = localStorage.getItem('token');
-
       const response = await fetch('/api/match/send-crush', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          recipientId: profileId
+        body: JSON.stringify({ 
+          recipientId: userId,
+          isSuperCrush: isSuperCrush 
         })
       });
 
       const data = await response.json();
-
+      
       if (data.success) {
-        setCrushesRemaining(data.crushesRemaining);
-        setSentCrushes(prev => new Set([...prev, profileId]));
+        if (isSuperCrush) {
+          setShowSuperCrush(true);
+          setTimeout(() => setShowSuperCrush(false), 3000);
+        }
+
+        if (data.isMatch) {
+          const matchedProfile = profiles[currentIndex];
+          setMatchedUser(matchedProfile);
+          setShowMatch(true);
+        }
+
+        // Update crush balance if not unlimited
+        if (!hasSubscription && typeof data.remainingCrushes === 'number') {
+          setCrushBalance(data.remainingCrushes);
+        }
+
+        // Move to next profile
+        handleNext();
       } else {
-        alert(data.message);
+        if (data.needsCrushes) {
+          alert('You need crushes to send! Click on your profile to purchase more or get unlimited access.');
+          // Optionally redirect to profile
+          // window.location.href = '/profile';
+        } else {
+          alert(data.message || 'Failed to send crush');
+        }
       }
     } catch (error) {
-      console.error('Send crush error:', error);
-      alert('Failed to send crush');
+      console.error('Error sending crush:', error);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setSendingCrush(false);
     }
   };
 
-  const handleProfileClick = (profileId) => {
-    navigate(`/profile/${profileId}`);
+  const handleNext = () => {
+    if (currentIndex < profiles.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      // Reload more profiles when we reach the end
+      loadProfiles();
+      setCurrentIndex(0);
+    }
+  };
+
+  const handleSkip = () => {
+    handleNext();
+  };
+
+  const handleRewind = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const handleRefresh = () => {
+    setLoading(true);
+    setCurrentIndex(0);
+    loadProfiles();
+    loadCrushBalance();
   };
 
   if (loading) {
     return (
-      <div className="browsing-container">
-        <div className="loading-message">
-          <p>Finding your perfect gym matches...</p>
+      <div className="browsing-container loading">
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>Finding your perfect gym partner...</p>
         </div>
       </div>
     );
   }
 
-  if (error) {
-    return (
-      <div className="browsing-container">
-        <div className="error-message">
-          <p>{error}</p>
-          <button className="btn-primary" onClick={() => navigate('/')}>Go Back</button>
-        </div>
-      </div>
-    );
+  if (profiles.length === 0 || currentIndex >= profiles.length) {
+    return <NoMoreProfiles onRefresh={handleRefresh} />;
   }
 
-  if (profiles.length === 0) {
-    return (
-      <div className="browsing-container">
-        <div className="no-profiles-message">
-          <h2>No profiles available</h2>
-          <p>Check back later for new gym members.</p>
-          <button className="btn-primary" onClick={() => navigate('/crushes')}>Visit My Crushes</button>
-        </div>
-      </div>
-    );
-  }
+  const currentProfile = profiles[currentIndex];
 
   return (
-    <div className="browsing-page-container">
-      <div className="browsing-container">
-        <div className="profiles-grid">
-          {profiles.map((profile) => (
-            <div key={profile.id} className="profile-card-browse">
-              <div
-                className="profile-image-container"
-                onClick={() => handleProfileClick(profile.id)}
-                style={{
-                  backgroundImage: profile.photos && profile.photos.length > 0 
-                    ? `url(${profile.photos[0].url || profile.photos[0]})`
-                    : 'none',
-                  backgroundColor: profile.photos && profile.photos.length > 0 
-                    ? 'transparent' 
-                    : '#FF3B30'
-                }}
-              >
-                <div className="profile-gradient-overlay">
-                  {(!profile.photos || profile.photos.length === 0) && (
-                    <div className="no-photo-placeholder">
-                      <span>💪</span>
-                      <p>No photo yet</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="profile-info-bottom">
-                <h3 className="profile-name">{profile.username}, {profile.age || '??'}</h3>
-                <p className="profile-location">{profile.location || 'Location not set'}</p>
-
-                <button 
-                  className={`crush-btn ${sentCrushes.has(profile.id) ? 'crush-sent' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSendCrush(profile.id);
-                  }}
-                  disabled={crushesRemaining === 0 || sentCrushes.has(profile.id)}
-                >
-                  {sentCrushes.has(profile.id) ? (
-                    <><span className="btn-icon">✓</span><span>Crush Sent</span></>
-                  ) : (
-                    <><span className="btn-icon">🔥</span><span>Send Crush</span></>
-                  )}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {crushesRemaining === 0 && (
-          <div className="out-of-crushes-overlay">
-            <p>You're out of crushes!</p>
-            <button className="cta-btn" onClick={() => navigate('/profile')}>Get More Crushes</button>
-          </div>
+    <div className="browsing-container">
+      <div className="crush-balance-indicator">
+        {hasSubscription ? (
+          <span className="unlimited-badge">∞ Unlimited</span>
+        ) : (
+          <span className="crush-count">{crushBalance} crushes</span>
         )}
       </div>
-      <Footer />
+
+      <div className="browse-header">
+        <h1>Find Your Gym Crush</h1>
+        <div className="header-stats">
+          <span className="profile-counter">
+            {currentIndex + 1} of {profiles.length}
+          </span>
+        </div>
+      </div>
+
+      <div className="cards-container">
+        <ProfileCard 
+          profile={currentProfile}
+          onCrush={() => handleSendCrush(currentProfile.id)}
+          onSkip={handleSkip}
+          isLoading={sendingCrush}
+        />
+      </div>
+
+      <div className="action-buttons">
+        <button 
+          className="action-btn rewind-btn" 
+          onClick={handleRewind}
+          disabled={currentIndex === 0 || sendingCrush}
+          title="Go back"
+        >
+          <span className="icon">↶</span>
+        </button>
+        
+        <button 
+          className="action-btn skip-btn" 
+          onClick={handleSkip}
+          disabled={sendingCrush}
+          title="Skip"
+        >
+          <span className="icon">✕</span>
+        </button>
+        
+        <button 
+          className="action-btn crush-btn" 
+          onClick={() => handleSendCrush(currentProfile.id)}
+          disabled={sendingCrush || (!hasSubscription && crushBalance <= 0)}
+          title="Send Crush"
+        >
+          <span className="icon">💪</span>
+        </button>
+        
+        <button 
+          className="action-btn super-crush-btn" 
+          onClick={() => handleSendCrush(currentProfile.id, true)}
+          disabled={sendingCrush || (!hasSubscription && crushBalance <= 0)}
+          title="Super Crush!"
+        >
+          <span className="icon">⚡</span>
+        </button>
+      </div>
+
+      {showMatch && matchedUser && (
+        <MatchModal 
+          user={matchedUser} 
+          onClose={() => {
+            setShowMatch(false);
+            setMatchedUser(null);
+          }} 
+        />
+      )}
+
+      {showSuperCrush && <SuperCrushAnimation />}
     </div>
   );
 };
