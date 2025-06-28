@@ -119,7 +119,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
             <button className="modal-close" onClick={handleClose}>×</button>
             
             <div className="modal-header">
-              <h2 className="modal-title">Welcome Back 💪</h2>
+              <h2 className="modal-title">Welcome Back</h2>
               <p className="modal-subtitle">Ready to crush your fitness goals?</p>
             </div>
 

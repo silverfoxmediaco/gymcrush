@@ -181,7 +181,7 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
         
         <div className="modal-header">
           <h2 className="modal-title">
-            {step === 1 && "Welcome to GymCrush 💪"}
+            {step === 1 && "Welcome to GymCrush"}
             {step === 2 && "Choose Your Username 🏋️"}
             {step === 3 && "Almost There! 🔥"}
           </h2>
