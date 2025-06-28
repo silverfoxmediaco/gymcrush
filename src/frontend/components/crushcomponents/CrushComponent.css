@@ -171,18 +171,14 @@
   }
   
   .balance-tips li {
-    padding-left: var(--space-lg);
+    
     position: relative;
     margin-bottom: var(--space-sm);
     color: var(--color-text-muted);
     line-height: 1.6;
   }
   
-  .balance-tips li:before {
-    content: "💪";
-    position: absolute;
-    left: 0;
-  }
+  
   
   /* Purchase Section */
   .purchase-section {

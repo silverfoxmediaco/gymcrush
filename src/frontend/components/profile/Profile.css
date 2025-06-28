@@ -271,6 +271,7 @@
     background: var(--color-neutral-silver);
     border-radius: var(--radius-sm);
     position: relative;
+    margin-top: 50px;
     z-index: 1;
   }
   
