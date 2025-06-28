@@ -10,6 +10,7 @@ import './Browsing.css';
 const Browsing = () => {
   const [profiles, setProfiles] = useState([]);
   const [crushesRemaining, setCrushesRemaining] = useState(0);
+  const [hasSubscription, setHasSubscription] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sentCrushes, setSentCrushes] = useState(new Set());
@@ -17,6 +18,7 @@ const Browsing = () => {
 
   useEffect(() => {
     fetchProfiles();
+    fetchCrushBalance();
   }, []);
 
   const fetchProfiles = async () => {
@@ -37,7 +39,6 @@ const Browsing = () => {
 
       if (data.success) {
         setProfiles(data.profiles);
-        setCrushesRemaining(data.seedsRemaining);
         setLoading(false);
       } else {
         setError(data.message);
@@ -50,9 +51,29 @@ const Browsing = () => {
     }
   };
 
+  const fetchCrushBalance = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/crushes/data', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setCrushesRemaining(data.balance || 0);
+        setHasSubscription(data.hasActiveSubscription || false);
+      }
+    } catch (error) {
+      console.error('Error loading crush balance:', error);
+    }
+  };
+
   const handleSendCrush = async (profileId) => {
-    if (crushesRemaining === 0) {
+    if (!hasSubscription && crushesRemaining <= 0) {
       alert('You\'re out of crushes! Visit your profile to get more.');
+      navigate('/profile');
       return;
     }
 
@@ -64,7 +85,7 @@ const Browsing = () => {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch('/api/match/send-seed', {
+      const response = await fetch('/api/match/send-crush', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,8 +99,18 @@ const Browsing = () => {
       const data = await response.json();
 
       if (data.success) {
-        setCrushesRemaining(data.seedsRemaining);
+        // Update crush count if not unlimited
+        if (!hasSubscription && typeof data.remainingCrushes === 'number') {
+          setCrushesRemaining(data.remainingCrushes);
+        }
+        
         setSentCrushes(prev => new Set([...prev, profileId]));
+        
+        if (data.isMatch) {
+          alert("It's a match! 💪❤️ Check your messages!");
+        } else {
+          alert('Crush sent successfully! 💪');
+        }
       } else {
         alert(data.message);
       }
@@ -120,7 +151,7 @@ const Browsing = () => {
         <div className="no-profiles-message">
           <h2>No profiles available</h2>
           <p>Check back later for new gym members.</p>
-          <button className="btn-primary" onClick={() => navigate('/')}>Visit My Crushes</button>
+          <button className="btn-primary" onClick={() => navigate('/crushes')}>Visit My Crushes</button>
         </div>
       </div>
     );
@@ -129,6 +160,15 @@ const Browsing = () => {
   return (
     <div className="browsing-page-container">
       <div className="browsing-container">
+        {/* Show crush balance at top */}
+        <div className="crush-balance-header">
+          {hasSubscription ? (
+            <span className="unlimited-badge">∞ Unlimited Crushes</span>
+          ) : (
+            <span className="crush-count">{crushesRemaining} crushes remaining</span>
+          )}
+        </div>
+
         <div className="profiles-grid">
           {profiles.map((profile) => (
             <div key={profile.id} className="profile-card-browse">
@@ -164,7 +204,7 @@ const Browsing = () => {
                     e.stopPropagation();
                     handleSendCrush(profile.id);
                   }}
-                  disabled={crushesRemaining === 0 || sentCrushes.has(profile.id)}
+                  disabled={(!hasSubscription && crushesRemaining <= 0) || sentCrushes.has(profile.id)}
                 >
                   {sentCrushes.has(profile.id) ? (
                     <><span className="btn-icon">✓</span><span>Crush Sent</span></>
@@ -177,7 +217,7 @@ const Browsing = () => {
           ))}
         </div>
 
-        {crushesRemaining === 0 && (
+        {!hasSubscription && crushesRemaining === 0 && (
           <div className="out-of-crushes-overlay">
             <p>You're out of crushes!</p>
             <button className="cta-btn" onClick={() => navigate('/profile')}>Get More Crushes</button>

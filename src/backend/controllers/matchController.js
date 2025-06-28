@@ -1,4 +1,4 @@
-// Updated Match Controller with Notifications and Crush Balance Check
+// Updated Match Controller with Notifications - SIMPLIFIED VERSION
 // Path: src/backend/controllers/matchController.js
 // Purpose: Handle matching/browsing functionality with email notifications
 
@@ -51,7 +51,6 @@ exports.getBrowseProfiles = [verifyToken, async (req, res) => {
       filterQuery['profile.gender'] = { $in: genderFilter };
     }
 
-    // USE filterQuery here, not the hardcoded object
     const profiles = await User.find(filterQuery)
       .select('-password -email')
       .limit(10);
@@ -87,13 +86,16 @@ exports.getBrowseProfiles = [verifyToken, async (req, res) => {
   }
 }];
 
-// POST: Send a crush to another user
+// POST: Send a crush to another user - SIMPLIFIED VERSION
 exports.sendCrush = [verifyToken, async (req, res) => {
   try {
     const { recipientId } = req.body;
+    const senderId = req.userId;
 
-    const sender = await User.findById(req.userId);
+    console.log('Send crush request:', { senderId, recipientId });
 
+    // Get sender
+    const sender = await User.findById(senderId);
     if (!sender) {
       return res.status(404).json({
         success: false,
@@ -106,6 +108,8 @@ exports.sendCrush = [verifyToken, async (req, res) => {
                                  sender.subscription?.currentPeriodEnd > new Date();
     
     const currentBalance = sender.crushBalance || 0;
+    
+    console.log('Sender crush status:', { hasActiveSubscription, currentBalance });
     
     if (!hasActiveSubscription && currentBalance <= 0) {
       return res.status(400).json({
@@ -139,48 +143,44 @@ exports.sendCrush = [verifyToken, async (req, res) => {
 
     // Check if recipient already sent a crush to sender (for match detection)
     const recipientSentToSender = recipient.crushes.sent.some(
-      crush => crush.to.toString() === req.userId
+      crush => crush.to.toString() === senderId
     );
 
-    // Start transaction to ensure data consistency
-    const session = await User.startSession();
-    session.startTransaction();
-
-    try {
-      // Update sender: add to sent list and decrease crush balance if not unlimited
-      const updateData = {
-        $push: {
-          'crushes.sent': {
-            to: recipientId,
-            sentAt: new Date()
-          }
+    // Update sender: add to sent list and decrease crush balance if not unlimited
+    const updateData = {
+      $push: {
+        'crushes.sent': {
+          to: recipientId,
+          sentAt: new Date()
         }
-      };
-
-      // Only decrease crush balance if user doesn't have active subscription
-      if (!hasActiveSubscription) {
-        updateData.$inc = { crushBalance: -1 };
       }
+    };
 
-      const updatedSender = await User.findByIdAndUpdate(
-        req.userId,
-        updateData,
-        { new: true, session }
-      );
+    // Only decrease crush balance if user doesn't have active subscription
+    if (!hasActiveSubscription) {
+      updateData.$inc = { crushBalance: -1 };
+    }
 
-      // Update recipient: add to received list
-      await User.findByIdAndUpdate(recipientId, {
-        $push: {
-          'crushes.received': {
-            from: req.userId,
-            receivedAt: new Date()
-          }
+    const updatedSender = await User.findByIdAndUpdate(
+      senderId,
+      updateData,
+      { new: true }
+    );
+
+    // Update recipient: add to received list
+    await User.findByIdAndUpdate(recipientId, {
+      $push: {
+        'crushes.received': {
+          from: senderId,
+          receivedAt: new Date()
         }
-      }, { session });
+      }
+    });
 
-      // Create transaction record
-      await CrushTransaction.create([{
-        userId: req.userId,
+    // Create transaction record
+    try {
+      await CrushTransaction.create({
+        userId: senderId,
         type: 'sent',
         action: 'sent',
         amount: 1,
@@ -189,34 +189,40 @@ exports.sendCrush = [verifyToken, async (req, res) => {
         recipientId: recipientId,
         recipientName: recipient.username,
         description: `Sent crush to ${recipient.username}`
-      }], { session });
+      });
+    } catch (txError) {
+      console.error('Transaction creation error:', txError);
+      // Don't fail the whole operation if transaction logging fails
+    }
 
-      await session.commitTransaction();
-
-      // Send notifications (outside of transaction)
+    // Send notifications (don't await to avoid blocking response)
+    try {
       if (recipientSentToSender) {
         // It's a match! Send match notifications to both users
-        await notificationService.sendMatchNotification(req.userId, recipientId);
+        notificationService.sendMatchNotification(senderId, recipientId).catch(console.error);
       } else {
         // Just send crush received notification to recipient
-        await notificationService.sendCrushReceivedNotification(req.userId, recipientId);
+        notificationService.sendCrushReceivedNotification(senderId, recipientId).catch(console.error);
       }
-
-      res.json({
-        success: true,
-        message: recipientSentToSender ? 'It\'s a match! 💪🔥' : 'Crush sent successfully!',
-        isMatch: recipientSentToSender,
-        remainingCrushes: hasActiveSubscription ? 'unlimited' : Math.max(0, updatedSender.crushBalance)
-      });
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
+    } catch (notifError) {
+      console.error('Notification error:', notifError);
+      // Don't fail the operation if notifications fail
     }
+
+    res.json({
+      success: true,
+      message: recipientSentToSender ? 'It\'s a match! 💪🔥' : 'Crush sent successfully!',
+      isMatch: recipientSentToSender,
+      remainingCrushes: hasActiveSubscription ? 'unlimited' : Math.max(0, updatedSender.crushBalance)
+    });
+
   } catch (error) {
     console.error('Send crush error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error occurred. Please try again.',
+      error: error.message 
+    });
   }
 }];
 
