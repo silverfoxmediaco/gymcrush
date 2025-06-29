@@ -55,35 +55,6 @@
     <meta name="rating" content="general" />
     <meta name="geo.region" content="US" />
     
-    <!-- Structured Data for SEO -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "MobileApplication",
-      "name": "GymCrush",
-      "applicationCategory": "LifestyleApplication",
-      "operatingSystem": "Web",
-      "description": "Fitness dating app connecting gym enthusiasts and active singles",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "ratingCount": "2453"
-      },
-      "featureList": [
-        "Match with fitness enthusiasts",
-        "Find workout partners",
-        "Chat with gym singles",
-        "Share fitness goals",
-        "Connect over shared interests"
-      ]
-    }
-    </script>
-    
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-7REJKP10X0"></script>
     <script>
@@ -91,6 +62,75 @@
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-7REJKP10X0');
+    </script>
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://gymcrush.io/#webapp",
+          "name": "GymCrush",
+          "url": "https://gymcrush.io",
+          "description": "Fitness dating app connecting gym enthusiasts and active singles. Find workout partners, gym buddies, and fitness relationships.",
+          "applicationCategory": "DatingApplication",
+          "operatingSystem": "Any",
+          "offers": {
+            "@type": "AggregateOffer",
+            "offerCount": "4",
+            "lowPrice": "0",
+            "highPrice": "29.99",
+            "priceCurrency": "USD"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "2453",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "featureList": [
+            "Match with fitness enthusiasts",
+            "Find local workout partners",
+            "Chat with gym singles",
+            "Share fitness goals",
+            "Browse by fitness interests",
+            "Send crushes to show interest",
+            "Premium unlimited messaging",
+            "Verified fitness profiles"
+          ]
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://gymcrush.io/#organization",
+          "name": "GymCrush",
+          "url": "https://gymcrush.io",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://gymcrush.io/src/frontend/assets/images/gymcrushlogo2.png",
+            "width": "512",
+            "height": "512"
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer support",
+            "url": "https://gymcrush.io/contact"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://gymcrush.io/#website",
+          "url": "https://gymcrush.io",
+          "name": "GymCrush - Fitness Dating App",
+          "description": "The #1 fitness dating app for gym enthusiasts",
+          "publisher": {
+            "@id": "https://gymcrush.io/#organization"
+          }
+        }
+      ]
+    }
     </script>
   </head>
   <body>
