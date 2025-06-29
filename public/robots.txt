@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /profile/
+Disallow: /messages/
+Disallow: /browse
+Disallow: /crushes
+Disallow: /settings
+
+Sitemap: https://gymcrush.io/sitemap.xml
