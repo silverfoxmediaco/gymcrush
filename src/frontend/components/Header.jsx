@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Header.css';
-import gymcrushLogo from '../assets/images/gymcrushlogo2.png';
+import gymcrushLogo from '../assets/images/gymcrushlogotrans300.png';
 
 const Header = ({ onSignupClick, onLoginClick, isLoggedIn, onLogout }) => {
   const [isScrolled, setIsScrolled] = useState(false);

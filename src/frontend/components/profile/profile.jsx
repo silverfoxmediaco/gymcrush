@@ -73,7 +73,106 @@ const Profile = () => {
   useEffect(() => {
     loadProfile();
     loadFilterPreferences();
+    checkForSuccessfulPurchase();
   }, []);
+
+  // Helper functions for purchase tracking
+  const getPackagePrice = (crushes) => {
+    const prices = { '5': 4.99, '15': 9.99, '30': 14.99, '60': 24.99 };
+    return prices[crushes] || 0;
+  };
+
+  const getPackageId = (crushes) => {
+    const ids = { '5': 'starter', '15': 'power', '30': 'athlete', '60': 'champion' };
+    return ids[crushes] || 'unknown';
+  };
+
+  const getPackageName = (crushes) => {
+    const names = { 
+      '5': 'Starter Pack', 
+      '15': 'Power Pack', 
+      '30': 'Athlete Bundle', 
+      '60': 'Champion Bundle' 
+    };
+    return names[crushes] || 'Unknown Package';
+  };
+
+  // Check for successful purchase and track it
+  const checkForSuccessfulPurchase = () => {
+    // Check URL parameters for successful payment
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    const subscriptionStatus = urlParams.get('subscription');
+    const crushCount = urlParams.get('crushes');
+    
+    if (paymentStatus === 'success' && crushCount && window.gtag) {
+      // Track crush package purchase
+      const price = getPackagePrice(crushCount);
+      const packageId = getPackageId(crushCount);
+      const packageName = getPackageName(crushCount);
+      
+      window.gtag('event', 'purchase', {
+        transaction_id: `GC-${Date.now()}`,
+        value: price,
+        currency: 'USD',
+        items: [{
+          item_id: packageId,
+          item_name: packageName,
+          item_category: 'crushes',
+          price: price,
+          quantity: 1
+        }]
+      });
+
+      // Also track as a custom event for more detail
+      window.gtag('event', 'crush_package_purchased', {
+        package_id: packageId,
+        crushes_count: parseInt(crushCount),
+        value: price
+      });
+
+      // Clear the URL parameters after tracking
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    if (subscriptionStatus === 'success' && window.gtag) {
+      // Track subscription purchase
+      window.gtag('event', 'purchase', {
+        transaction_id: `GC-SUB-${Date.now()}`,
+        value: 29.99,
+        currency: 'USD',
+        items: [{
+          item_id: 'unlimited_monthly',
+          item_name: 'Unlimited Monthly Membership',
+          item_category: 'subscription',
+          price: 29.99,
+          quantity: 1
+        }]
+      });
+
+      // Also track as a custom event
+      window.gtag('event', 'subscription_started', {
+        subscription_type: 'unlimited_monthly',
+        value: 29.99
+      });
+
+      // Clear the URL parameters after tracking
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // Track cancelled purchases
+    if (paymentStatus === 'cancelled' && window.gtag) {
+      window.gtag('event', 'payment_cancelled', {
+        payment_type: crushCount ? 'crush_package' : 'unknown'
+      });
+    }
+
+    if (subscriptionStatus === 'cancelled' && window.gtag) {
+      window.gtag('event', 'subscription_cancelled', {
+        subscription_type: 'unlimited_monthly'
+      });
+    }
+  };
 
   const loadProfile = async () => {
     const token = localStorage.getItem('token');
@@ -151,6 +250,16 @@ const Profile = () => {
       if (data.success) {
         setFilterPreferences(filters);
         alert('Match preferences saved! 💪');
+        
+        // Track filter preferences saved
+        if (window.gtag) {
+          window.gtag('event', 'preferences_saved', {
+            preference_type: 'match_filters',
+            age_range: `${filters.ageMin}-${filters.ageMax}`,
+            distance: filters.distance,
+            gender_preference: filters.gender?.join(',') || 'not_set'
+          });
+        }
       } else {
         alert(data.message || 'Failed to save preferences');
       }
@@ -237,6 +346,15 @@ const Profile = () => {
           ...prev,
           photos: data.photos
         }));
+        
+        // Track photo upload
+        if (window.gtag) {
+          window.gtag('event', 'content_upload', {
+            content_type: 'profile_photo',
+            photo_count: files.length,
+            total_photos: data.photos.length
+          });
+        }
       } else {
         setPhotoError(data.message || 'Failed to upload photos');
       }
@@ -392,6 +510,26 @@ const Profile = () => {
       if (data.success) {
         alert('Profile saved successfully! 💪');
         setIsEditing(false);
+        
+        // Track profile completion
+        const completion = calculateCompletion();
+        if (window.gtag) {
+          window.gtag('event', 'profile_updated', {
+            profile_completion: completion,
+            has_photos: profileData.photos.length > 0,
+            interests_count: profileData.interests.length,
+            prompts_answered: profileData.prompts.filter(p => p.answer).length
+          });
+          
+          // Special event for 100% completion
+          if (completion === 100) {
+            window.gtag('event', 'profile_completed', {
+              profile_completion_percentage: 100,
+              has_photos: true,
+              interests_count: profileData.interests.length
+            });
+          }
+        }
       } else {
         alert(data.message || 'Failed to save profile');
       }
@@ -729,12 +867,27 @@ const Profile = () => {
         </section>
 
         {/* Crushes Section */}
-        <section className="profile-section">
+        <section className="profile-section" id="crushes">
           <div className="my-crushes-header">
             <h2>My Crushes</h2>
             <button 
               className="btn-secondary my-crushes-toggle" 
-              onClick={() => setShowCrushes(!showCrushes)}
+              onClick={() => {
+                setShowCrushes(!showCrushes);
+                // Track when users view crush packages
+                if (!showCrushes && window.gtag) {
+                  window.gtag('event', 'view_item_list', {
+                    item_list_name: 'crush_packages',
+                    items: [
+                      { item_id: 'starter', item_name: 'Starter Pack', price: 4.99, item_category: 'crushes' },
+                      { item_id: 'power', item_name: 'Power Pack', price: 9.99, item_category: 'crushes' },
+                      { item_id: 'athlete', item_name: 'Athlete Bundle', price: 14.99, item_category: 'crushes' },
+                      { item_id: 'champion', item_name: 'Champion Bundle', price: 24.99, item_category: 'crushes' },
+                      { item_id: 'unlimited_monthly', item_name: 'Unlimited Monthly', price: 29.99, item_category: 'subscription' }
+                    ]
+                  });
+                }
+              }}
             >
               {showCrushes ? 'Hide' : 'Show'} Crushes
             </button>
