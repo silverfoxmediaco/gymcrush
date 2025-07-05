@@ -5,7 +5,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Footer.css';
-import gymcrushLogo from '../assets/images/gymcrushlogo2.png';
+import gymcrushLogo from '../assets/images/gymcrushtran192.png';
 import facebookIcon from '../assets/images/facebook (1).png';
 import tiktokIcon from '../assets/images/tiktok.png';
 import instagramIcon from '../assets/images/instagram.png';
