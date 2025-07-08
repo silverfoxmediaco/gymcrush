@@ -1,12 +1,23 @@
-// Admin Routes
+// Admin Routes (Placeholder)
 // Path: src/backend/routes/adminRoutes.js
-// Purpose: Define admin-related API endpoints
+// Purpose: Placeholder for future admin functionality
 
 const express = require('express');
 const router = express.Router();
-const { createMockProfiles } = require('../controllers/adminController');
 
-// POST /api/admin/create-mock-profiles - Create mock user profiles
-router.post('/create-mock-profiles', createMockProfiles);
+// Placeholder route
+router.get('/', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'Admin routes placeholder' 
+  });
+});
+
+// Future admin routes can be added here
+// Examples:
+// - User management
+// - Report management
+// - Site statistics
+// - Content moderation
 
 module.exports = router;
