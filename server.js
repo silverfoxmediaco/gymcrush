@@ -74,7 +74,7 @@ app.use('/api/stats', require('./src/backend/routes/statsRoutes'));
 app.use('/api/crushes', require('./src/backend/routes/crushRoutes'));
 app.use('/api/match', require('./src/backend/routes/matchRoutes'));
 app.use('/api/chat', require('./src/backend/routes/chatRoutes'));
-app.use('/api/admin', require('./src/backend/routes/adminRoutes'));
+
 app.use('/api/members', require('./src/backend/routes/membersRoutes'));
 app.use('/api/users', require('./src/backend/routes/usersRoutes'));
 app.use('/api/crush-account', require('./src/backend/routes/crushAccountRoutes'));
