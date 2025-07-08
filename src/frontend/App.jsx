@@ -15,8 +15,6 @@ import Profile from './components/profile/profile';
 import ProfileView from './components/profile/ProfileView';
 import Browsing from './components/browse/Browsing';
 import Crushes from './components/crushes/Crushes';
-import CrushComponent from './components/crushcomponents/CrushComponent';
-import MockProfilesManager from './components/admin/MockProfilesManager';
 import Messages from './components/messages/Messages';
 import Contact from './components/Contact';
 import ResetPassword from './components/ResetPassword';
@@ -150,12 +148,6 @@ function AppContent() {
           <Route path="/messages/:userId" element={
             <ProtectedRoute>
               <Messages />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/admin/mock-profiles" element={
-            <ProtectedRoute>
-              <MockProfilesManager />
             </ProtectedRoute>
           } />
           
