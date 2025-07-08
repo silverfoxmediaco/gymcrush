@@ -1,7 +1,7 @@
 {
   "name": "gymcrush",
   "version": "1.0.0",
-  "type": "module",
+  
   "description": "Where Strength Meets Community",
   "author": "GymCrush Team",
   "main": "server.js",
