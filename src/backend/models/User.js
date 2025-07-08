@@ -2,8 +2,8 @@
 // Path: src/backend/models/User.js
 // Purpose: Complete user model with all GymCrush features
 
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -354,4 +354,5 @@ userSchema.index({ createdAt: -1 });
 
 // 2dsphere index is already created in the coordinates field definition
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+export default User;
