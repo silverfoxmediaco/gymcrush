@@ -354,5 +354,4 @@ userSchema.index({ createdAt: -1 });
 
 // 2dsphere index is already created in the coordinates field definition
 
-const User = mongoose.model('User', userSchema);
-export default User;
+module.exports = mongoose.model('User', userSchema);
