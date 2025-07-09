@@ -23,7 +23,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // Get a specific user's profile
-exports.getUserProfile = [verifyToken, async (req, res) => {
+export const getUserProfile = [verifyToken, async (req, res) => {
   try {
     const { userId } = req.params;
     
