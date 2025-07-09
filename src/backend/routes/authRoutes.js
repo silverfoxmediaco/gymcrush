@@ -18,6 +18,9 @@ import {
 } from '../validators/authValidator.js';
 import { handleValidationErrors } from '../middleware/validation.js';
 
+const router = express.Router();
+
+// POST /api/auth/register - Register new user
 router.post(
   '/register',
   validateRegister,           // Apply validation rules
