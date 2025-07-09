@@ -24,7 +24,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // Get user's crush data including balance
-exports.getCrushes = [verifyToken, async (req, res) => {
+export const getCrushes = [verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     
@@ -92,7 +92,7 @@ exports.getCrushes = [verifyToken, async (req, res) => {
 }];
 
 // Get crush data including balance and history
-exports.getCrushData = [verifyToken, async (req, res) => {
+export const getCrushData = [verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     
@@ -134,7 +134,7 @@ exports.getCrushData = [verifyToken, async (req, res) => {
 }];
 
 // Create Stripe checkout session for crush packages
-exports.createCheckoutSession = [verifyToken, async (req, res) => {
+export const createCheckoutSession = [verifyToken, async (req, res) => {
   try {
     const { packageId, crushes, amount } = req.body;
     
@@ -151,7 +151,7 @@ exports.createCheckoutSession = [verifyToken, async (req, res) => {
 }];
 
 // Create subscription
-exports.createSubscription = [verifyToken, async (req, res) => {
+export const createSubscription = [verifyToken, async (req, res) => {
   try {
     // Forward to crushAccountController
     const crushAccountController = require('./crushAccountController');
@@ -166,7 +166,7 @@ exports.createSubscription = [verifyToken, async (req, res) => {
 }];
 
 // Cancel subscription
-exports.cancelSubscription = [verifyToken, async (req, res) => {
+export const cancelSubscription = [verifyToken, async (req, res) => {
   try {
     // Forward to crushAccountController
     const crushAccountController = require('./crushAccountController');

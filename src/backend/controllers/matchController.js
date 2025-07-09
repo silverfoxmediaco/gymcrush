@@ -25,7 +25,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // GET: Browse profiles
-exports.getBrowseProfiles = [verifyToken, async (req, res) => {
+export const getBrowseProfiles = [verifyToken, async (req, res) => {
   try {
     const currentUser = await User.findById(req.userId);
 
@@ -87,7 +87,7 @@ exports.getBrowseProfiles = [verifyToken, async (req, res) => {
 }];
 
 // POST: Send a crush to another user - SIMPLIFIED VERSION
-exports.sendCrush = [verifyToken, async (req, res) => {
+export const sendCrush = [verifyToken, async (req, res) => {
   try {
     const { recipientId } = req.body;
     const senderId = req.userId;

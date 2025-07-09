@@ -10,7 +10,7 @@ import upload from '../middleware/uploadMiddleware.js';
 import notificationService from '../services/notificationService.js';
 
 // Get all conversations for the logged-in user
-exports.getConversations = async (req, res) => {
+export const getConversations = async (req, res) => {
   try {
     const conversations = await Message.getConversationsForUser(req.userId);
     
@@ -28,7 +28,7 @@ exports.getConversations = async (req, res) => {
 };
 
 // Get messages between logged-in user and another user
-exports.getMessages = async (req, res) => {
+export const getMessages = async (req, res) => {
   try {
     const { userId } = req.params;
     const currentUserId = req.userId;
@@ -111,7 +111,7 @@ exports.getMessages = async (req, res) => {
 };
 
 // Send a text message
-exports.sendMessage = async (req, res) => {
+export const sendMessage = async (req, res) => {
   try {
     const { receiverId, content } = req.body;
     const senderId = req.userId;
@@ -191,7 +191,7 @@ exports.sendMessage = async (req, res) => {
 };
 
 // Send an image message (premium feature check)
-exports.sendImage = [
+export const sendImage = [
   upload.single('image'), 
   async (req, res) => {
     try {
@@ -324,7 +324,7 @@ exports.sendImage = [
 ];
 
 // Mark messages as read
-exports.markAsRead = async (req, res) => {
+export const markAsRead = async (req, res) => {
   try {
     const { conversationId } = req.params;
     const userId = req.userId;
@@ -373,7 +373,7 @@ exports.markAsRead = async (req, res) => {
 };
 
 // Delete a message
-exports.deleteMessage = async (req, res) => {
+export const deleteMessage = async (req, res) => {
   try {
     const { messageId } = req.params;
     const userId = req.userId;
@@ -430,7 +430,7 @@ exports.deleteMessage = async (req, res) => {
 };
 
 // Get unread message count
-exports.getUnreadCount = async (req, res) => {
+export const getUnreadCount = async (req, res) => {
   try {
     const userId = req.userId;
     
