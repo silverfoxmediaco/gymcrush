@@ -2,7 +2,7 @@
 // Path: src/backend/models/Messages.js
 // Purpose: Define the Message schema for MongoDB
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema({
   conversationId: {
@@ -202,4 +202,4 @@ messageSchema.methods.markAsRead = function() {
   return Promise.resolve(this);
 };
 
-module.exports = mongoose.model('Message', messageSchema);
+export default mongoose.model('Message', messageSchema);

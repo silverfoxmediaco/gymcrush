@@ -2,8 +2,8 @@
 // Path: src/backend/services/emailService.js
 // Purpose: Handle all email sending functionality
 
-const nodemailer = require('nodemailer');
-const { Resend } = require('resend');
+import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 // Initialize Resend if API key is provided
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -398,7 +398,7 @@ const emailTemplates = {
 };
 
 // Main email sending function with Resend support
-const sendEmail = async (options) => {
+export const sendEmail = async (options) => {
   try {
     // Use Resend if available and configured
     if (process.env.EMAIL_SERVICE === 'resend' && resend) {
@@ -443,7 +443,7 @@ const sendEmail = async (options) => {
 };
 
 // Specific email functions
-const sendPasswordResetEmail = async (email, resetUrl, username) => {
+export const sendPasswordResetEmail = async (email, resetUrl, username) => {
   const template = emailTemplates.passwordReset(resetUrl, username);
   return await sendEmail({
     to: email,
@@ -451,7 +451,7 @@ const sendPasswordResetEmail = async (email, resetUrl, username) => {
   });
 };
 
-const sendWelcomeEmail = async (email, username) => {
+export const sendWelcomeEmail = async (email, username) => {
   const template = emailTemplates.welcome(username);
   return await sendEmail({
     to: email,
@@ -460,18 +460,10 @@ const sendWelcomeEmail = async (email, username) => {
 };
 
 // NEW: Send email verification
-const sendVerificationEmail = async (email, username, verificationUrl) => {
+export const sendVerificationEmail = async (email, username, verificationUrl) => {
   const template = emailTemplates.emailVerification(username, verificationUrl);
   return await sendEmail({
     to: email,
     ...template
   });
-};
-
-// Export all functions
-module.exports = {
-  sendEmail,
-  sendPasswordResetEmail,
-  sendWelcomeEmail,
-  sendVerificationEmail
 };

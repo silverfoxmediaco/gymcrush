@@ -2,11 +2,11 @@
 // Path: src/backend/controllers/authController.js
 // Purpose: Authentication controller with password reset functionality
 
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const bcrypt = require('bcryptjs');
-const { sendPasswordResetEmail, sendWelcomeEmail } = require('../services/emailService');
+import User from '../models/User.js';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
+import { sendPasswordResetEmail, sendWelcomeEmail } from '../services/emailService.js';
 
 // Generate JWT token
 const generateToken = (userId) => {
@@ -21,7 +21,7 @@ const generateResetToken = () => {
 };
 
 // Register new user
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
   try {
     const { email, password, username, dateOfBirth } = req.body;
 
@@ -143,7 +143,7 @@ exports.register = async (req, res) => {
 };
 
 // Login user
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -205,7 +205,7 @@ exports.login = async (req, res) => {
 };
 
 // Forgot password - Send reset token
-exports.forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -271,7 +271,7 @@ exports.forgotPassword = async (req, res) => {
 };
 
 // Reset password - Use reset token to change password
-exports.resetPassword = async (req, res) => {
+export const resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
@@ -342,7 +342,7 @@ exports.resetPassword = async (req, res) => {
 };
 
 // Verify reset token - Check if token is valid
-exports.verifyResetToken = async (req, res) => {
+export const verifyResetToken = async (req, res) => {
   try {
     const { token } = req.params;
 
@@ -380,7 +380,7 @@ exports.verifyResetToken = async (req, res) => {
 };
 
 // Get current user
-exports.getMe = async (req, res) => {
+export const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId)
       .select('-password -passwordResetToken -passwordResetExpires');

@@ -2,9 +2,8 @@
 // Path: src/backend/routes/crushAccountRoutes.js
 // Purpose: Define crush account subscription and purchase-related API endpoints
 
-const express = require('express');
-const router = express.Router();
-const {
+import express from 'express';
+import {
   getAccountData,
   createCheckoutSession,
   createSubscription,
@@ -12,7 +11,9 @@ const {
   refundPurchase,
   getPurchaseHistory,
   cancelSubscription
-} = require('../controllers/crushAccountController');
+} from '../controllers/crushAccountController.js';
+
+const router = express.Router();
 
 // GET /api/crush-account/data - Get user's account status and purchase history
 router.get('/data', getAccountData);
@@ -35,4 +36,4 @@ router.post('/bonus', addBonusCredits);
 // POST /api/crush-account/refund - Process refund (admin only)
 router.post('/refund', refundPurchase);
 
-module.exports = router;
+export default router;

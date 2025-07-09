@@ -2,9 +2,10 @@
 // Path: src/backend/routes/matchRoutes.js
 // Purpose: Define matching/browsing API endpoints
 
-const express = require('express');
+import express from 'express';
+import { getBrowseProfiles, sendCrush } from '../controllers/matchController.js';
+
 const router = express.Router();
-const { getBrowseProfiles, sendCrush } = require('../controllers/matchController');
 
 // GET /api/match/browse - Get profiles to browse
 router.get('/browse', getBrowseProfiles);
@@ -12,4 +13,4 @@ router.get('/browse', getBrowseProfiles);
 // POST /api/match/send-crush - Send a crush (like) to someone
 router.post('/send-crush', sendCrush);
 
-module.exports = router;
+export default router;

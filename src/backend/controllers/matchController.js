@@ -2,10 +2,10 @@
 // Path: src/backend/controllers/matchController.js
 // Purpose: Handle matching/browsing functionality with email notifications
 
-const User = require('../models/User');
-const CrushTransaction = require('../models/CrushTransaction');
-const jwt = require('jsonwebtoken');
-const notificationService = require('../services/notificationService');
+import User from '../models/User.js';
+import CrushTransaction from '../models/CrushTransaction.js';
+import jwt from 'jsonwebtoken';
+import notificationService from '../services/notificationService.js';
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {

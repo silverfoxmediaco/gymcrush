@@ -2,10 +2,10 @@
 // Path: src/backend/controllers/profileController.js
 // Purpose: Handle profile-related operations with Cloudinary photo upload
 
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const upload = require('../middleware/uploadMiddleware');
-const cloudinary = require('../config/cloudinary');
+import User from '../models/User.js';
+import jwt from 'jsonwebtoken';
+import upload from '../middleware/uploadMiddleware.js';
+import cloudinary from '../config/cloudinary.js';
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {

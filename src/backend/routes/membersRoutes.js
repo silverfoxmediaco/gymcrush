@@ -2,9 +2,10 @@
 // Path: src/backend/routes/membersRoutes.js
 // Purpose: Public endpoints for displaying members
 
-const express = require('express');
+import express from 'express';
+import User from '../models/User.js';
+
 const router = express.Router();
-const User = require('../models/User');
 
 // GET /api/members/featured - Get featured members for landing page (public)
 router.get('/featured', async (req, res) => {
@@ -88,4 +89,4 @@ router.get('/featured', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

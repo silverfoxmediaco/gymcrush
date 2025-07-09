@@ -2,11 +2,11 @@
 // Path: src/backend/middleware/validation.js
 // Purpose: Handle request validation and sanitization
 
-const { validationResult } = require('express-validator');
-const { ValidationError } = require('./errorHandler');
+import { validationResult } from 'express-validator';
+import { ValidationError } from './errorHandler.js';
 
 // Main validation handler middleware
-const handleValidationErrors = (req, res, next) => {
+export const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   
   if (!errors.isEmpty()) {
@@ -39,7 +39,7 @@ const handleValidationErrors = (req, res, next) => {
 };
 
 // Custom validators
-const customValidators = {
+export const customValidators = {
   // Check if age is 18+
   isAdult: (dateOfBirth) => {
     const birthDate = new Date(dateOfBirth);
@@ -231,7 +231,7 @@ const customValidators = {
 };
 
 // Common validation chains for reuse
-const commonValidations = {
+export const commonValidations = {
   // Email validation
   email: {
     notEmpty: {
@@ -314,10 +314,4 @@ const commonValidations = {
     trim: true,
     escape: true
   })
-};
-
-module.exports = {
-  handleValidationErrors,
-  customValidators,
-  commonValidations
 };

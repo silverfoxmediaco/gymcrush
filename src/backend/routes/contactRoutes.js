@@ -2,9 +2,10 @@
 // Path: src/backend/routes/contactRoutes.js
 // Purpose: Handle contact form submissions
 
-const express = require('express');
+import express from 'express';
+import { sendEmail } from '../services/emailService.js';
+
 const router = express.Router();
-const { sendEmail } = require('../services/emailService');
 
 // POST /api/contact - Submit contact form
 router.post('/', async (req, res) => {
@@ -82,7 +83,7 @@ router.post('/', async (req, res) => {
     }
     
     // Optionally, save to database for tracking
-    // const Contact = require('../models/Contact');
+    // import Contact from '../models/Contact.js';
     // await Contact.create({
     //   name,
     //   email,
@@ -124,4 +125,4 @@ router.get('/subjects', (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

@@ -2,7 +2,7 @@
 // Path: src/backend/models/CrushTransaction.js
 // Purpose: Track all crush account and subscription-related transactions
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const crushTransactionSchema = new mongoose.Schema({
   userId: {
@@ -217,4 +217,4 @@ crushTransactionSchema.set('toJSON', {
   virtuals: true
 });
 
-module.exports = mongoose.model('CrushTransaction', crushTransactionSchema);
+export default mongoose.model('CrushTransaction', crushTransactionSchema);

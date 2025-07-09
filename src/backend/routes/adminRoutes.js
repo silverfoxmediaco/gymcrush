@@ -2,7 +2,7 @@
 // Path: src/backend/routes/adminRoutes.js
 // Purpose: Placeholder for future admin functionality
 
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Placeholder route
@@ -20,4 +20,4 @@ router.get('/', (req, res) => {
 // - Site statistics
 // - Content moderation
 
-module.exports = router;
+export default router;

@@ -2,24 +2,22 @@
 // Path: src/backend/routes/authRoutes.js
 // Purpose: Authentication routes with input validation
 
-const express = require('express');
-const router = express.Router();
-const { 
+import express from 'express';
+import { 
   register, 
   login,
   forgotPassword,
   resetPassword,
   verifyResetToken
-} = require('../controllers/authController');
-const { 
+} from '../controllers/authController.js';
+import { 
   validateRegister, 
   validateLogin,
   validatePasswordResetRequest,
   validatePasswordReset
-} = require('../validators/authValidator');
-const { handleValidationErrors } = require('../middleware/validation');
+} from '../validators/authValidator.js';
+import { handleValidationErrors } from '../middleware/validation.js';
 
-// POST /api/auth/register - Register new user
 router.post(
   '/register',
   validateRegister,           // Apply validation rules
@@ -65,4 +63,4 @@ router.post(
 );
 */
 
-module.exports = router;
+export default router;

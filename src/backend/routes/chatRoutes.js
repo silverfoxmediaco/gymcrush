@@ -2,7 +2,7 @@
 // Path: src/backend/routes/chatRoutes.js
 // Purpose: Placeholder for future chat functionality
 
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Placeholder routes
@@ -33,4 +33,4 @@ router.post('/send', (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;
