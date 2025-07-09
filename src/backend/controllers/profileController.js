@@ -25,7 +25,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // Get user profile
-exports.getProfile = [verifyToken, async (req, res) => {
+export const getProfile = [verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('-password');
     if (!user) {
@@ -39,7 +39,7 @@ exports.getProfile = [verifyToken, async (req, res) => {
 }];
 
 // Update user profile
-exports.updateProfile = [verifyToken, async (req, res) => {
+export const updateProfile = [verifyToken, async (req, res) => {
   try {
     const {
       age,
@@ -97,7 +97,7 @@ exports.updateProfile = [verifyToken, async (req, res) => {
 }];
 
 // Upload profile photos
-exports.uploadPhotos = [verifyToken, upload.array('photos', 6), async (req, res) => {
+export const uploadPhotos = [verifyToken, upload.array('photos', 6), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ success: false, message: 'No photos uploaded' });
@@ -156,7 +156,7 @@ exports.uploadPhotos = [verifyToken, upload.array('photos', 6), async (req, res)
 }];
 
 // Delete a photo
-exports.deletePhoto = [verifyToken, async (req, res) => {
+export const deletePhoto = [verifyToken, async (req, res) => {
   try {
     const { photoId } = req.params;
     const user = await User.findById(req.userId);
@@ -191,7 +191,7 @@ exports.deletePhoto = [verifyToken, async (req, res) => {
 }];
 
 // Update photo display mode
-exports.updatePhotoDisplayMode = [verifyToken, async (req, res) => {
+export const updatePhotoDisplayMode = [verifyToken, async (req, res) => {
   try {
     const { photoId } = req.params;
     const { displayMode } = req.body;
@@ -222,7 +222,7 @@ exports.updatePhotoDisplayMode = [verifyToken, async (req, res) => {
 }];
 
 // NEW: Get all user profiles for browsing
-exports.getAllProfiles = [verifyToken, async (req, res) => {
+export const getAllProfiles = [verifyToken, async (req, res) => {
   try {
     const currentUser = await User.findById(req.userId);
     
