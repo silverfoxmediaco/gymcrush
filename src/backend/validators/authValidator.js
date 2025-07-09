@@ -2,11 +2,11 @@
 // Path: src/backend/validators/authValidator.js
 // Purpose: Validation rules for authentication routes
 
-const { body } = require('express-validator');
-const { customValidators } = require('../middleware/validation');
+import { body } from 'express-validator';
+import { customValidators } from '../middleware/validation.js';
 
 // Validation rules for user registration
-const validateRegister = [
+export const validateRegister = [
   // Email validation
   body('email')
     .notEmpty().withMessage('Email is required')
@@ -45,7 +45,7 @@ const validateRegister = [
 ];
 
 // Validation rules for user login
-const validateLogin = [
+export const validateLogin = [
   // Email validation
   body('email')
     .notEmpty().withMessage('Email is required')
@@ -61,7 +61,7 @@ const validateLogin = [
 ];
 
 // Validation rules for password reset request
-const validatePasswordResetRequest = [
+export const validatePasswordResetRequest = [
   body('email')
     .notEmpty().withMessage('Email is required')
     .isEmail().withMessage('Please provide a valid email')
@@ -71,7 +71,7 @@ const validatePasswordResetRequest = [
 ];
 
 // Validation rules for password reset
-const validatePasswordReset = [
+export const validatePasswordReset = [
   body('token')
     .notEmpty().withMessage('Reset token is required')
     .isLength({ min: 20 }).withMessage('Invalid reset token')
@@ -91,18 +91,10 @@ const validatePasswordReset = [
 ];
 
 // Validation rules for email verification
-const validateEmailVerification = [
+export const validateEmailVerification = [
   body('token')
     .notEmpty().withMessage('Verification token is required')
     .isLength({ min: 20 }).withMessage('Invalid verification token')
     .trim()
     .escape()
 ];
-
-module.exports = {
-  validateRegister,
-  validateLogin,
-  validatePasswordResetRequest,
-  validatePasswordReset,
-  validateEmailVerification
-};

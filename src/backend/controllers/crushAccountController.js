@@ -2,10 +2,10 @@
 // Path: src/backend/controllers/crushAccountController.js
 // Purpose: Handle crush account subscription operations and Stripe integration
 
-const User = require('../models/User');
-const CrushTransaction = require('../models/CrushTransaction');
-const stripe = require('../config/stripe');
-const jwt = require('jsonwebtoken');
+import User from '../models/User.js';
+import CrushTransaction from '../models/CrushTransaction.js';
+import stripe from '../config/stripe.js';
+import jwt from 'jsonwebtoken';
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -25,7 +25,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // Create Stripe subscription
-exports.createSubscription = [verifyToken, async (req, res) => {
+export const createSubscription = [verifyToken, async (req, res) => {
  try {
    const user = await User.findById(req.userId);
    
@@ -109,7 +109,7 @@ exports.createSubscription = [verifyToken, async (req, res) => {
 }];
 
 // Cancel subscription
-exports.cancelSubscription = [verifyToken, async (req, res) => {
+export const cancelSubscription = [verifyToken, async (req, res) => {
  try {
    const user = await User.findById(req.userId);
    
@@ -158,7 +158,7 @@ exports.cancelSubscription = [verifyToken, async (req, res) => {
 }];
 
 // Get account data
-exports.getAccountData = [verifyToken, async (req, res) => {
+export const getAccountData = [verifyToken, async (req, res) => {
  try {
    const user = await User.findById(req.userId).select('username subscription accountTier crushes');
    
@@ -212,7 +212,7 @@ exports.getAccountData = [verifyToken, async (req, res) => {
 }];
 
 // Get detailed purchase history
-exports.getPurchaseHistory = [verifyToken, async (req, res) => {
+export const getPurchaseHistory = [verifyToken, async (req, res) => {
  try {
    const page = parseInt(req.query.page) || 1;
    const limit = parseInt(req.query.limit) || 20;
@@ -245,7 +245,7 @@ exports.getPurchaseHistory = [verifyToken, async (req, res) => {
 }];
 
 // Create Stripe checkout session (for one-time crush purchases)
-exports.createCheckoutSession = [verifyToken, async (req, res) => {
+export const createCheckoutSession = [verifyToken, async (req, res) => {
  try {
    const { packageId, crushes, amount } = req.body;
    
@@ -344,7 +344,7 @@ exports.createCheckoutSession = [verifyToken, async (req, res) => {
 }];
 
 // Handle Stripe webhook
-exports.handleStripeWebhook = async (req, res) => {
+export const handleStripeWebhook = async (req, res) => {
  const sig = req.headers['stripe-signature'];
  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
  
@@ -522,7 +522,7 @@ exports.handleStripeWebhook = async (req, res) => {
 };
 
 // Add bonus credits (admin function)
-exports.addBonusCredits = [verifyToken, async (req, res) => {
+export const addBonusCredits = [verifyToken, async (req, res) => {
  try {
    const { userId, tier, duration, reason } = req.body;
    
@@ -587,7 +587,7 @@ exports.addBonusCredits = [verifyToken, async (req, res) => {
 }];
 
 // Process refund (admin function)
-exports.refundPurchase = [verifyToken, async (req, res) => {
+export const refundPurchase = [verifyToken, async (req, res) => {
  try {
    const { userId, transactionId, reason } = req.body;
    

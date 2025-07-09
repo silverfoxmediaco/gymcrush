@@ -2,8 +2,8 @@
 // Path: src/backend/controllers/usersController.js
 // Purpose: Handle user profile viewing
 
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
+import User from '../models/User.js';
+import jwt from 'jsonwebtoken';
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {

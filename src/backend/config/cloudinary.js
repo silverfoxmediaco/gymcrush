@@ -2,7 +2,7 @@
 // Path: src/backend/config/cloudinary.js
 // Purpose: Configure Cloudinary for image uploads
 
-const cloudinary = require('cloudinary').v2;
+import { v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -11,4 +11,4 @@ cloudinary.config({
   secure: true  // Forces HTTPS URLs
 });
 
-module.exports = cloudinary;
+export default cloudinary;

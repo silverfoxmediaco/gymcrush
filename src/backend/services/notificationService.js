@@ -2,8 +2,8 @@
 // Path: src/backend/services/notificationService.js
 // Purpose: Handle all email notifications for GymCrush
 
-const { sendEmail } = require('./emailService');
-const User = require('../models/User');
+import { sendEmail } from './emailService.js';
+import User from '../models/User.js';
 
 // Email templates for notifications
 const notificationTemplates = {
@@ -752,4 +752,4 @@ const notificationService = {
   }
 };
 
-module.exports = notificationService;
+export default notificationService;

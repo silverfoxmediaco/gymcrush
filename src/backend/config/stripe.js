@@ -2,6 +2,8 @@
 // Path: src/backend/config/stripe.js
 // Purpose: Initialize Stripe with secret key
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+import Stripe from 'stripe';
 
-module.exports = stripe;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+export default stripe;

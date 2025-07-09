@@ -2,12 +2,12 @@
 // Path: src/backend/controllers/messageController.js
 // Purpose: Handle message-related operations with email notifications
 
-const Message = require('../models/Messages');
-const User = require('../models/User');
-const CrushTransaction = require('../models/CrushTransaction');
-const cloudinary = require('../config/cloudinary');
-const upload = require('../middleware/uploadMiddleware');
-const notificationService = require('../services/notificationService');
+import Message from '../models/Messages.js';
+import User from '../models/User.js';
+import CrushTransaction from '../models/CrushTransaction.js';
+import cloudinary from '../config/cloudinary.js';
+import upload from '../middleware/uploadMiddleware.js';
+import notificationService from '../services/notificationService.js';
 
 // Get all conversations for the logged-in user
 exports.getConversations = async (req, res) => {

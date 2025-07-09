@@ -2,9 +2,9 @@
 // Path: src/backend/controllers/crushController.js
 // Purpose: Handle crush-related operations (crushes sent/received, matches)
 
-const User = require('../models/User');
-const CrushTransaction = require('../models/CrushTransaction');
-const jwt = require('jsonwebtoken');
+import User from '../models/User.js';
+import CrushTransaction from '../models/CrushTransaction.js';
+import jwt from 'jsonwebtoken';
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {

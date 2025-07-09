@@ -1,17 +1,39 @@
 // File: server.js
 // Path: /server.js (root directory)
 
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const path = require('path');
-const { createServer } = require('http');
-const { Server } = require('socket.io');
-const fs = require('fs');
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import path from 'path';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Import error handling middleware
-const { errorLogger, errorHandler, notFoundHandler } = require('./src/backend/middleware/errorHandler');
+import { errorLogger, errorHandler, notFoundHandler } from './src/backend/middleware/errorHandler.js';
+
+// Import routes
+import authRoutes from './src/backend/routes/authRoutes.js';
+import profileRoutes from './src/backend/routes/profileRoutes.js';
+import statsRoutes from './src/backend/routes/statsRoutes.js';
+import crushRoutes from './src/backend/routes/crushRoutes.js';
+import matchRoutes from './src/backend/routes/matchRoutes.js';
+import chatRoutes from './src/backend/routes/chatRoutes.js';
+import membersRoutes from './src/backend/routes/membersRoutes.js';
+import usersRoutes from './src/backend/routes/usersRoutes.js';
+import crushAccountRoutes from './src/backend/routes/crushAccountRoutes.js';
+import messageRoutes from './src/backend/routes/messageRoutes.js';
+import contactRoutes from './src/backend/routes/contactRoutes.js';
+
+// Import webhook handler
+import { handleStripeWebhook } from './src/backend/controllers/crushAccountController.js';
 
 // Load environment variables
 dotenv.config();
@@ -35,7 +57,7 @@ app.use(cors({
 app.post(
  '/api/crush-account/webhook',
  express.raw({ type: 'application/json' }),
- require('./src/backend/controllers/crushAccountController').handleStripeWebhook
+ handleStripeWebhook
 );
 
 // Now add body parser for all other routes
@@ -68,18 +90,17 @@ app.get('/api/health', (req, res) => {
 });
 
 // Auth routes
-app.use('/api/auth', require('./src/backend/routes/authRoutes'));
-app.use('/api/profile', require('./src/backend/routes/profileRoutes'));
-app.use('/api/stats', require('./src/backend/routes/statsRoutes'));
-app.use('/api/crushes', require('./src/backend/routes/crushRoutes'));
-app.use('/api/match', require('./src/backend/routes/matchRoutes'));
-app.use('/api/chat', require('./src/backend/routes/chatRoutes'));
-
-app.use('/api/members', require('./src/backend/routes/membersRoutes'));
-app.use('/api/users', require('./src/backend/routes/usersRoutes'));
-app.use('/api/crush-account', require('./src/backend/routes/crushAccountRoutes'));
-app.use('/api/messages', require('./src/backend/routes/messageRoutes'));
-app.use('/api/contact', require('./src/backend/routes/contactRoutes'));
+app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/crushes', crushRoutes);
+app.use('/api/match', matchRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/members', membersRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/crush-account', crushAccountRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {

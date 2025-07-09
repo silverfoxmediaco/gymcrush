@@ -2,17 +2,19 @@
 // Path: src/backend/routes/profileRoutes.js
 // Purpose: Define profile-related API endpoints including notification preferences and username-based profile viewing
 
-const express = require('express');
-const router = express.Router();
-const { 
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import { 
   getProfile, 
   updateProfile, 
   uploadPhotos, 
   deletePhoto,
   updatePhotoDisplayMode,
   getAllProfiles
-} = require('../controllers/profileController');
-const User = require('../models/User');
+} from '../controllers/profileController.js';
+import User from '../models/User.js';
+
+const router = express.Router();
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -23,7 +25,6 @@ const verifyToken = (req, res, next) => {
   }
   
   try {
-    const jwt = require('jsonwebtoken');
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = decoded.userId;
     next();
@@ -321,4 +322,4 @@ router.delete('/photos/:photoId', deletePhoto);
 // PATCH /api/profile/photos/:photoId/display-mode - Update photo display mode
 router.patch('/photos/:photoId/display-mode', updatePhotoDisplayMode);
 
-module.exports = router;
+export default router;

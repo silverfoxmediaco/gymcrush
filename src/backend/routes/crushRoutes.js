@@ -2,10 +2,11 @@
 // Path: src/backend/routes/crushRoutes.js
 // Purpose: Define crush-related API endpoints
 
-const express = require('express');
+import express from 'express';
+import { getCrushes, getCrushData } from '../controllers/crushController.js';
+import * as crushAccountController from '../controllers/crushAccountController.js';
+
 const router = express.Router();
-const { getCrushes, getCrushData } = require('../controllers/crushController');
-const crushAccountController = require('../controllers/crushAccountController');
 
 // GET /api/crushes - Get user's crushes data
 router.get('/', getCrushes);
@@ -27,4 +28,4 @@ router.post('/refund', crushAccountController.refundPurchase);
 // Stripe webhook (Note: This needs express.raw() middleware)
 router.post('/webhook', express.raw({type: 'application/json'}), crushAccountController.handleStripeWebhook);
 
-module.exports = router;
+export default router;

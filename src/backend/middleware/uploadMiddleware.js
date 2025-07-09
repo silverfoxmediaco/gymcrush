@@ -2,9 +2,9 @@
 // Path: src/backend/middleware/uploadMiddleware.js
 // Purpose: Handle file uploads with Multer and Cloudinary
 
-const multer = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('../config/cloudinary');
+import multer from 'multer';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import cloudinary from '../config/cloudinary.js';
 
 // Configure Cloudinary storage
 const storage = new CloudinaryStorage({
@@ -48,7 +48,7 @@ const upload = multer({
 });
 
 // Error handling middleware for multer
-const handleMulterError = (err, req, res, next) => {
+export const handleMulterError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
@@ -69,5 +69,4 @@ const handleMulterError = (err, req, res, next) => {
   next();
 };
 
-module.exports = upload;
-module.exports.handleMulterError = handleMulterError;
+export default upload;

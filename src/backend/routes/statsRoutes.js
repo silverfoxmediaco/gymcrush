@@ -2,9 +2,10 @@
 // Path: src/backend/routes/statsRoutes.js
 // Purpose: Public statistics endpoints
 
-const express = require('express');
+import express from 'express';
+import User from '../models/User.js';
+
 const router = express.Router();
-const User = require('../models/User');
 
 // GET /api/stats/members - Get member statistics (public endpoint)
 router.get('/members', async (req, res) => {
@@ -50,4 +51,4 @@ router.get('/members', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

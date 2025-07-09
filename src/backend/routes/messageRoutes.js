@@ -2,9 +2,9 @@
 // Path: src/backend/routes/messageRoutes.js
 // Purpose: Define message-related API endpoints
 
-const express = require('express');
-const router = express.Router();
-const {
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import {
   getConversations,
   getMessages,
   sendMessage,
@@ -12,8 +12,10 @@ const {
   deleteMessage,
   sendImage,
   getUnreadCount
-} = require('../controllers/messageController');
-const { handleMulterError } = require('../middleware/uploadMiddleware');
+} from '../controllers/messageController.js';
+import { handleMulterError } from '../middleware/uploadMiddleware.js';
+
+const router = express.Router();
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -24,7 +26,6 @@ const verifyToken = (req, res, next) => {
   }
   
   try {
-    const jwt = require('jsonwebtoken');
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = decoded.userId;
     next();
@@ -55,4 +56,4 @@ router.delete('/:messageId', verifyToken, deleteMessage);
 // GET /api/messages/unread/count - Get unread message count
 router.get('/unread/count', verifyToken, getUnreadCount);
 
-module.exports = router;
+export default router;
