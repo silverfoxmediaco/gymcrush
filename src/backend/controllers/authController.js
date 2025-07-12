@@ -91,14 +91,13 @@ export const register = async (req, res) => {
       }
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    // DON'T hash password here - the User model's pre-save hook will handle it
+    // Removed the bcrypt hashing lines
 
     // Create user with initial profile data
     const user = await User.create({
       email: email.toLowerCase(),
-      password: hashedPassword,
+      password: password,  // Pass plain password - will be hashed by pre-save hook
       username,
       dateOfBirth: dob,
       crushBalance: 5, // Give new users 5 free crushes
@@ -302,9 +301,8 @@ export const resetPassword = async (req, res) => {
       });
     }
 
-    // Hash new password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
+    // Set the new password - let the pre-save hook hash it
+    user.password = newPassword;  // Changed: removed manual hashing
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     
