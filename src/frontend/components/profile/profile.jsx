@@ -1,6 +1,5 @@
 // Profile Component
 // Path: src/frontend/components/profile/profile.jsx
-// Purpose: User profile creation and editing with photo display modes
 
 import React, { useState, useEffect } from 'react';
 import FilterSettings from './FilterSettings';
@@ -422,22 +421,29 @@ const Profile = () => {
         const { latitude, longitude } = position.coords;
         
         try {
-          // Reverse geocode to get city name
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-          );
+          const token = localStorage.getItem('token');
+          // Use YOUR backend endpoint for reverse geocoding
+          const response = await fetch('/api/profile/reverse-geocode', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ latitude, longitude })
+          });
+          
           const data = await response.json();
           
-          const city = data.address.city || data.address.town || data.address.village;
-          const state = data.address.state;
-          const displayLocation = `${city}, ${state}`;
-          
-          setProfileData(prev => ({
-            ...prev,
-            location: displayLocation,
-            coordinates: [longitude, latitude],
-            locationType: 'device'
-          }));
+          if (data.success) {
+            setProfileData(prev => ({
+              ...prev,
+              location: data.location,
+              coordinates: [longitude, latitude],
+              locationType: 'device'
+            }));
+          } else {
+            alert('Could not determine your city. Please enter manually.');
+          }
           
           setGettingLocation(false);
         } catch (error) {
@@ -456,13 +462,21 @@ const Profile = () => {
 
   const geocodeLocation = async (location) => {
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`
-      );
+      const token = localStorage.getItem('token');
+      // Use YOUR backend endpoint for geocoding
+      const response = await fetch('/api/profile/geocode', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ location })
+      });
+      
       const data = await response.json();
       
-      if (data && data[0]) {
-        return [parseFloat(data[0].lon), parseFloat(data[0].lat)];
+      if (data.success) {
+        return data.coordinates; // [longitude, latitude]
       }
     } catch (error) {
       console.error('Geocoding error:', error);
@@ -496,7 +510,10 @@ const Profile = () => {
           height: profileData.height,
           bodyType: profileData.bodyType,
           location: profileData.location,
-          coordinates: coordinates,
+          coordinates: coordinates ? {
+            type: 'Point',
+            coordinates: coordinates
+          } : undefined,
           locationType: profileData.locationType,
           bio: profileData.bio,
           interests: profileData.interests,
