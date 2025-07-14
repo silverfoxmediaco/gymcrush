@@ -59,9 +59,11 @@ const LandingPage = ({ onSignupClick }) => (
       <HowItWorks onStartPlanting={onSignupClick} />
     </div>
     
+    {/* Temporarily disabling the CurrentMembers section
+    
     <div id="current-members">
       <CurrentMembers onSignupClick={onSignupClick} />
-    </div>
+    </div>*/}
   </>
 );
 
