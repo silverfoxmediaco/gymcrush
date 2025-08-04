@@ -23,10 +23,10 @@ export const validateRegister = [
     .trim(),
   
   // Confirm password validation
-  body('confirmPassword')
-    .notEmpty().withMessage('Please confirm your password')
-    .custom((value, { req }) => value === req.body.password)
-    .withMessage('Passwords do not match'),
+  //body('confirmPassword')
+   // .notEmpty().withMessage('Please confirm your password')
+  //  .custom((value, { req }) => value === req.body.password)
+  //  .withMessage('Passwords do not match'),
   
   // Username validation
   body('username')

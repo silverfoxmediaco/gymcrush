@@ -3,7 +3,13 @@
 // Purpose: Define crush-related API endpoints
 
 import express from 'express';
-import { getCrushes, getCrushData } from '../controllers/crushController.js';
+import { 
+  getCrushes, 
+  getCrushData,
+  verifyApplePurchase,
+  verifyAppleSubscription,
+  restorePurchases
+} from '../controllers/crushController.js';
 import * as crushAccountController from '../controllers/crushAccountController.js';
 
 const router = express.Router();
@@ -14,7 +20,12 @@ router.get('/', getCrushes);
 // GET /api/crushes/data - Get crush balance and history
 router.get('/data', getCrushData);
 
-// Payment and subscription routes
+// Apple In-App Purchase routes
+router.post('/verify-apple-purchase', verifyApplePurchase);
+router.post('/verify-apple-subscription', verifyAppleSubscription);
+router.post('/restore-purchases', restorePurchases);
+
+// Payment and subscription routes (Stripe)
 router.post('/create-checkout', crushAccountController.createCheckoutSession);
 router.post('/create-subscription', crushAccountController.createSubscription);
 router.post('/cancel-subscription', crushAccountController.cancelSubscription);

@@ -81,12 +81,12 @@ const errorLogger = (err, req, res, next) => {
 const handleMongoError = (err) => {
   if (err.code === 11000) {
     // Duplicate key error
-    const field = Object.keys(err.keyPattern)[0];
+    const field = err.keyPattern ? Object.keys(err.keyPattern)[0] : 'field';
     return new ConflictError(`${field} already exists`);
   }
   
-  if (err.name === 'ValidationError') {
-    // Mongoose validation error
+  if (err.name === 'ValidationError' && err.errors) {
+    // Mongoose validation error - safely handle missing errors object
     const errors = Object.values(err.errors).map(e => e.message);
     return new ValidationError(errors.join(', '));
   }
