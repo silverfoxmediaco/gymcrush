@@ -190,7 +190,7 @@ export const sendMessage = async (req, res) => {
   }
 };
 
-// Send an image message (premium feature check)
+// Send an image message (NO TIER RESTRICTIONS)
 export const sendImage = [
   upload.single('image'), 
   async (req, res) => {
@@ -245,19 +245,7 @@ export const sendImage = [
         });
       }
       
-      // Check if user has permission to send images based on tier
-      const canSendImage = checkImagePermission(sender.accountTier);
-      
-      if (!canSendImage) {
-        // Clean up uploaded image
-        if (req.file.filename) {
-          await cloudinary.uploader.destroy(req.file.filename);
-        }
-        return res.status(403).json({
-          success: false,
-          message: 'Upgrade to Premium or Elite to send images!'
-        });
-      }
+      // REMOVED TIER CHECK - All matched users can send images
       
       // Get the Cloudinary URL from the uploaded file
       const imageUrl = req.file.path || req.file.secure_url;
@@ -452,15 +440,3 @@ export const getUnreadCount = async (req, res) => {
     });
   }
 };
-
-// Helper function to check image sending permission based on tier
-function checkImagePermission(accountTier) {
-  const tierPermissions = {
-    free: false,
-    basic: false,
-    premium: true,
-    elite: true
-  };
-  
-  return tierPermissions[accountTier] || false;
-}
