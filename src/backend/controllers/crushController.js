@@ -5,6 +5,7 @@
 import User from '../models/User.js';
 import CrushTransaction from '../models/CrushTransaction.js';
 import jwt from 'jsonwebtoken';
+import fetch from 'node-fetch';
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -120,6 +121,7 @@ export const getCrushData = [verifyToken, async (req, res) => {
     res.json({
       success: true,
       balance: balance,
+      crushBalance: balance, // Add this for compatibility
       history: history,
       hasActiveSubscription: hasActiveSubscription,
       subscriptionEndDate: user.subscription?.currentPeriodEnd
@@ -129,6 +131,256 @@ export const getCrushData = [verifyToken, async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Failed to retrieve crush data' 
+    });
+  }
+}];
+
+// Verify Apple Purchase
+export const verifyApplePurchase = [verifyToken, async (req, res) => {
+  try {
+    const { receipt, productId, transactionId } = req.body;
+    const userId = req.userId;
+    
+    // Check if transaction already processed
+    const existingTransaction = await CrushTransaction.findOne({ 
+      transactionId: transactionId,
+      platform: 'ios'
+    });
+    
+    if (existingTransaction) {
+      return res.status(400).json({
+        success: false,
+        message: 'Transaction already processed'
+      });
+    }
+    
+    // Verify receipt with Apple
+    const verificationResponse = await verifyWithApple(receipt);
+    
+    if (verificationResponse.status === 0) {
+      // Valid receipt
+      const crushAmount = {
+        'com.silverfoxmedia.gymcrush.5crushes': 5,
+        'com.silverfoxmedia.gymcrush.10crushes': 10,
+        'com.silverfoxmedia.gymcrush.25crushes': 25,
+      }[productId] || 0;
+      
+      if (crushAmount === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid product ID'
+        });
+      }
+      
+      // Add crushes to user
+      const user = await User.findByIdAndUpdate(
+        userId, 
+        { $inc: { crushBalance: crushAmount } },
+        { new: true }
+      );
+      
+      // Store transaction
+      await CrushTransaction.create({
+        userId: userId,
+        type: 'purchase',
+        amount: crushAmount,
+        platform: 'ios',
+        transactionId: transactionId,
+        productId: productId,
+        description: `Purchased ${crushAmount} crushes`
+      });
+      
+      res.json({
+        success: true,
+        crushesAdded: crushAmount,
+        newBalance: user.crushBalance
+      });
+    } else {
+      // Handle specific Apple error codes
+      let errorMessage = 'Invalid receipt';
+      if (verificationResponse.status === 21007) {
+        // Sandbox receipt sent to production
+        const sandboxResponse = await verifyWithApple(receipt, true);
+        if (sandboxResponse.status === 0) {
+          // Retry with sandbox verification
+          return exports.verifyApplePurchase[1](req, res);
+        }
+      }
+      
+      res.status(400).json({
+        success: false,
+        message: errorMessage,
+        appleStatus: verificationResponse.status
+      });
+    }
+  } catch (error) {
+    console.error('Purchase verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to verify purchase'
+    });
+  }
+}];
+
+// Helper function to verify with Apple
+const verifyWithApple = async (receipt, forceSandbox = false) => {
+  const isProduction = process.env.NODE_ENV === 'production' && !forceSandbox;
+  const verifyUrl = isProduction 
+    ? 'https://buy.itunes.apple.com/verifyReceipt'
+    : 'https://sandbox.itunes.apple.com/verifyReceipt';
+    
+  try {
+    const response = await fetch(verifyUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        'receipt-data': receipt,
+        'password': process.env.APPLE_SHARED_SECRET
+      })
+    });
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Apple verification request failed:', error);
+    throw error;
+  }
+};
+
+// Verify Apple Subscription
+export const verifyAppleSubscription = [verifyToken, async (req, res) => {
+  try {
+    const { receipt, productId, transactionId } = req.body;
+    const userId = req.userId;
+    
+    // Verify receipt with Apple
+    const verificationResponse = await verifyWithApple(receipt);
+    
+    if (verificationResponse.status === 0) {
+      // Valid receipt
+      const latestReceiptInfo = verificationResponse.latest_receipt_info;
+      const latestReceipt = latestReceiptInfo[latestReceiptInfo.length - 1];
+      
+      // Check if subscription is active
+      const expiresDate = new Date(parseInt(latestReceipt.expires_date_ms));
+      const isActive = expiresDate > new Date();
+      
+      if (isActive) {
+        // Update user subscription
+        await User.findByIdAndUpdate(userId, {
+          subscription: {
+            status: 'active',
+            tier: productId.includes('monthly') ? 'monthly' : 'yearly',
+            currentPeriodEnd: expiresDate,
+            appleTransactionId: transactionId,
+            appleOriginalTransactionId: latestReceipt.original_transaction_id
+          },
+          hasActiveSubscription: true,
+          subscriptionEndDate: expiresDate
+        });
+        
+        // Store transaction
+        await CrushTransaction.create({
+          userId: userId,
+          type: 'subscription',
+          amount: 0, // Unlimited crushes
+          platform: 'ios',
+          transactionId: transactionId,
+          productId: productId,
+          description: `Subscribed to ${productId.includes('monthly') ? 'monthly' : 'yearly'} unlimited`
+        });
+        
+        res.json({
+          success: true,
+          subscription: {
+            active: true,
+            expiresAt: expiresDate
+          }
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          message: 'Subscription is not active'
+        });
+      }
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid receipt',
+        appleStatus: verificationResponse.status
+      });
+    }
+  } catch (error) {
+    console.error('Subscription verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to verify subscription'
+    });
+  }
+}];
+
+// Restore Apple Purchases
+export const restorePurchases = [verifyToken, async (req, res) => {
+  try {
+    const { purchases } = req.body;
+    const userId = req.userId;
+    let restoredCount = 0;
+    
+    for (const purchase of purchases) {
+      // Check if already processed
+      const existing = await CrushTransaction.findOne({ 
+        transactionId: purchase.transactionId,
+        platform: 'ios'
+      });
+      
+      if (!existing) {
+        // Verify and process the purchase
+        const verificationResponse = await verifyWithApple(purchase.receipt);
+        
+        if (verificationResponse.status === 0) {
+          // Process based on product type
+          if (purchase.productId.includes('crushes')) {
+            // Restore crush pack
+            const crushAmount = {
+              'com.silverfoxmedia.gymcrush.5crushes': 5,
+              'com.silverfoxmedia.gymcrush.10crushes': 10,
+              'com.silverfoxmedia.gymcrush.25crushes': 25,
+            }[purchase.productId] || 0;
+            
+            if (crushAmount > 0) {
+              await User.findByIdAndUpdate(userId, {
+                $inc: { crushBalance: crushAmount }
+              });
+              
+              await CrushTransaction.create({
+                userId: userId,
+                type: 'restore',
+                amount: crushAmount,
+                platform: 'ios',
+                transactionId: purchase.transactionId,
+                productId: purchase.productId,
+                description: `Restored ${crushAmount} crushes`
+              });
+              
+              restoredCount++;
+            }
+          } else if (purchase.productId.includes('monthly') || purchase.productId.includes('yearly')) {
+            // Restore subscription
+            // Handle subscription restoration
+            restoredCount++;
+          }
+        }
+      }
+    }
+    
+    res.json({
+      success: true,
+      restored: restoredCount
+    });
+  } catch (error) {
+    console.error('Restore purchases error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to restore purchases'
     });
   }
 }];

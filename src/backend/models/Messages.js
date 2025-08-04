@@ -1,4 +1,4 @@
-// Message Model
+// Message Model - FIXED
 // Path: src/backend/models/Messages.js
 // Purpose: Define the Message schema for MongoDB
 
@@ -104,7 +104,10 @@ messageSchema.statics.getConversationsForUser = async function(userId) {
   const conversations = await this.aggregate([
     {
       $match: {
-        $or: [{ sender: mongoose.Types.ObjectId(userId) }, { receiver: mongoose.Types.ObjectId(userId) }],
+        $or: [
+          { sender: new mongoose.Types.ObjectId(userId) }, 
+          { receiver: new mongoose.Types.ObjectId(userId) }
+        ],
         deleted: false
       }
     },
@@ -118,10 +121,12 @@ messageSchema.statics.getConversationsForUser = async function(userId) {
         unreadCount: {
           $sum: {
             $cond: [
-              { $and: [
-                { $eq: ['$receiver', mongoose.Types.ObjectId(userId)] },
-                { $eq: ['$read', false] }
-              ]},
+              { 
+                $and: [
+                  { $eq: ['$receiver', new mongoose.Types.ObjectId(userId)] },
+                  { $eq: ['$read', false] }
+                ]
+              },
               1,
               0
             ]
@@ -152,7 +157,7 @@ messageSchema.statics.getConversationsForUser = async function(userId) {
         unreadCount: 1,
         otherUser: {
           $cond: [
-            { $eq: ['$lastMessage.sender', mongoose.Types.ObjectId(userId)] },
+            { $eq: ['$lastMessage.sender', new mongoose.Types.ObjectId(userId)] },
             { $arrayElemAt: ['$receiverInfo', 0] },
             { $arrayElemAt: ['$senderInfo', 0] }
           ]

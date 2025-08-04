@@ -1,6 +1,6 @@
 // User.js
 // Path: src/backend/models/User.js
-// Purpose: Complete user model with all GymCrush features
+// Purpose: Complete user model with all GymCrush features - FIXED
 
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
@@ -192,7 +192,33 @@ const userSchema = new mongoose.Schema({
         type: String,
         maxlength: 200
       }
-    }]
+    }],
+    notifications: {
+      emailEnabled: {
+        type: Boolean,
+        default: true
+      },
+      crushReceived: {
+        type: Boolean,
+        default: true
+      },
+      newMessage: {
+        type: Boolean,
+        default: true
+      },
+      newMatch: {
+        type: Boolean,
+        default: true
+      },
+      premiumExpiring: {
+        type: Boolean,
+        default: true
+      },
+      marketing: {
+        type: Boolean,
+        default: false
+      }
+    }
   },
   crushes: {
     sent: [{
@@ -254,41 +280,48 @@ const userSchema = new mongoose.Schema({
     },
     gender: [{
       type: String,
-      enum: ['Men', 'Women', 'Non-binary', 'Everyone']
+      enum: ['Men', 'Women'],
+      default: []
     }],
-    heightMin: String,
-    heightMax: String,
-    interests: [String],
-    lookingFor: [String],
-    hasPhoto: {
+    lookingFor: [{
+      type: String,
+      enum: ['Long-term relationship', 'Workout partner', 'Something casual', 'Not sure yet', 'New gym buddies'],
+      default: []
+    }],
+    heightMin: {
+      type: String,
+      default: ''
+    },
+    heightMax: {
+      type: String,
+      default: ''
+    },
+    interests: [{
+      type: String,
+      default: []
+    }],
+    // Additional filter preferences for the app
+    fitnessLevel: {
+      type: String,
+      enum: ['any', 'beginner', 'intermediate', 'advanced', 'athlete'],
+      default: 'any'
+    },
+    bodyTypes: [{
+      type: String,
+      default: ['Any']
+    }],
+    gymFrequency: {
+      type: String,
+      enum: ['any', 'rarely', '1-2x_week', '3-4x_week', '5-6x_week', 'daily'],
+      default: 'any'
+    },
+    verifiedOnly: {
       type: Boolean,
       default: false
-    }
-  },
-  notifications: {
-    emailEnabled: {
+    },
+    hasPhotosOnly: {
       type: Boolean,
       default: true
-    },
-    crushReceived: {
-      type: Boolean,
-      default: true
-    },
-    newMessage: {
-      type: Boolean,
-      default: true
-    },
-    newMatch: {
-      type: Boolean,
-      default: true
-    },
-    premiumExpiring: {
-      type: Boolean,
-      default: true
-    },
-    marketing: {
-      type: Boolean,
-      default: false
     }
   },
   lastPremiumExpiringNotification: {

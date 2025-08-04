@@ -1,0 +1,165 @@
+/* MockProfilesManager Component Styles
+   Path: src/frontend/components/admin/MockProfilesManager.css */
+
+   .mock-profiles-manager {
+    min-height: 100vh;
+    padding: var(--space-xl) var(--space-lg);
+    background-color: var(--color-background);
+  }
+  
+  .mock-profiles-manager h1 {
+    color: var(--color-primary);
+    text-align: center;
+    margin-bottom: var(--space-sm);
+  }
+  
+  .subtitle {
+    text-align: center;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-xl);
+  }
+  
+  /* Profiles Preview Section */
+  .profiles-preview {
+    background: white;
+    border-radius: 16px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .profiles-preview h2 {
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-lg);
+  }
+  
+  .profiles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
+  }
+  
+  .profile-preview-card {
+    background: var(--color-background);
+    padding: var(--space-lg);
+    border-radius: 12px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+  
+  .profile-preview-card:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(147, 125, 194, 0.15);
+  }
+  
+  .profile-preview-card h3 {
+    color: var(--color-primary);
+    font-size: 1.125rem;
+    margin-bottom: var(--space-sm);
+  }
+  
+  .profile-preview-card p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin-bottom: var(--space-sm);
+  }
+  
+  .bio-preview {
+    font-size: 0.875rem !important;
+    line-height: 1.4;
+    margin-bottom: var(--space-md) !important;
+  }
+  
+  /* Interests Preview */
+  .interests-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    align-items: center;
+  }
+  
+  .interest-chip {
+    background: var(--color-accent-2);
+    color: var(--color-text-primary);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .more-interests {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-style: italic;
+  }
+  
+  /* Message Styles */
+  .message {
+    padding: var(--space-md) var(--space-lg);
+    border-radius: 8px;
+    margin-bottom: var(--space-lg);
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  .message.success {
+    background: rgba(129, 199, 132, 0.1);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+  }
+  
+  .message.error {
+    background: rgba(229, 115, 115, 0.1);
+    color: var(--color-error);
+    border: 1px solid var(--color-error);
+  }
+  
+  /* Button Styles */
+  .create-btn {
+    display: block;
+    margin: 0 auto;
+    padding: var(--space-md) var(--space-xl);
+    font-size: 1.125rem;
+  }
+  
+  .create-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  /* Confirm Section */
+  .confirm-section {
+    background: white;
+    border-radius: 12px;
+    padding: var(--space-xl);
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .confirm-section p {
+    font-size: 1.125rem;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-lg);
+  }
+  
+  .confirm-buttons {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .profiles-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .confirm-buttons {
+      flex-direction: column;
+    }
+    
+    .confirm-buttons .btn {
+      width: 100%;
+    }
+  }

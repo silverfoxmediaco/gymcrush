@@ -113,11 +113,11 @@ export const register = async (req, res) => {
     const token = generateToken(user._id);
     
     // Send welcome email (optional - don't let it block registration)
-    if (sendWelcomeEmail) {
-      sendWelcomeEmail(user.email, user.username).catch(err => {
-        console.error('Welcome email error:', err);
-      });
-    }
+    //if (sendWelcomeEmail) {
+    //  sendWelcomeEmail(user.email, user.username).catch(err => {
+    //    console.error('Welcome email error:', err);
+    //  });
+   // }
 
     res.status(201).json({
       success: true,
