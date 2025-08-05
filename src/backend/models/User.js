@@ -324,6 +324,58 @@ const userSchema = new mongoose.Schema({
       default: true
     }
   },
+  // Settings - Notifications (separate from profile.notifications for settings page)
+  notifications: {
+    newMatches: {
+      type: Boolean,
+      default: true
+    },
+    messages: {
+      type: Boolean,
+      default: true
+    },
+    crushesReceived: {
+      type: Boolean,
+      default: true
+    },
+    profileViews: {
+      type: Boolean,
+      default: false
+    },
+    marketingEmails: {
+      type: Boolean,
+      default: false
+    }
+  },
+  // Settings - Privacy
+  privacy: {
+    showOnlineStatus: {
+      type: Boolean,
+      default: true
+    },
+    showLastActive: {
+      type: Boolean,
+      default: true
+    },
+    readReceipts: {
+      type: Boolean,
+      default: true
+    },
+    profileVisibility: {
+      type: String,
+      enum: ['everyone', 'matches', 'no_one'],
+      default: 'everyone'
+    }
+  },
+  // Activity tracking
+  lastActive: {
+    type: Date,
+    default: Date.now
+  },
+  isOnline: {
+    type: Boolean,
+    default: false
+  },
   lastPremiumExpiringNotification: {
     type: Date,
     default: null
