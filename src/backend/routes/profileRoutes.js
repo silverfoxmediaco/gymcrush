@@ -3,7 +3,6 @@
 // Purpose: Define profile-related API endpoints including notification preferences and username-based profile viewing
 
 import express from 'express';
-import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import cloudinary from '../config/cloudinary.js'; // Use your existing config
 import { 
@@ -15,6 +14,7 @@ import {
   getAllProfiles
 } from '../controllers/profileController.js';
 import User from '../models/User.js';
+import { verifyToken } from '../middleware/authMiddleware.js';  // Import shared middleware
 
 const router = express.Router();
 
@@ -63,33 +63,52 @@ const uploadToCloudinary = (buffer, options = {}) => {
   });
 };
 
-// Middleware to verify JWT token
-const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  
-  if (!token) {
-    return res.status(401).json({ success: false, message: 'No token provided' });
-  }
-  
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.userId;
-    next();
-  } catch (error) {
-    return res.status(401).json({ success: false, message: 'Invalid token' });
-  }
-};
+// PUBLIC ROUTES (no authentication needed)
 
-//NEW: GET /api/profile/all - Get all user profiles (no match filter)
+// GET /api/profile/all - Get all user profiles (for browsing)
 router.get('/all', getAllProfiles);
 
+// GET /api/profile/user/:username - Get profile by username (public profiles)
+router.get('/user/:username', async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    // Find user by username (case-insensitive)
+    const user = await User.findOne({ 
+      username: { $regex: new RegExp(`^${username}$`, 'i') } 
+    })
+    .select('-password -email -resetPasswordToken -resetPasswordExpires -stripeCustomerId -stripeSubscriptionId');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      profile: user
+    });
+    
+  } catch (error) {
+    console.error('Get profile by username error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to load profile'
+    });
+  }
+});
+
+// PROTECTED ROUTES (authentication required)
+
 // GET /api/profile - Get current user's profile
-router.get('/', getProfile);
+router.get('/', verifyToken, getProfile);
 
 // PUT /api/profile - Update current user's profile
-router.put('/', updateProfile);
+router.put('/', verifyToken, updateProfile);
 
-// NEW: POST /api/profile/complete-onboarding - Complete user onboarding with Cloudinary
+// POST /api/profile/complete-onboarding - Complete user onboarding with Cloudinary
 router.post('/complete-onboarding', verifyToken, upload.array('photos', 6), async (req, res) => {
   try {
     const userId = req.userId;
@@ -253,38 +272,6 @@ router.post('/complete-onboarding', verifyToken, upload.array('photos', 6), asyn
       success: false,
       message: 'Failed to complete profile setup',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
-
-// GET /api/profile/user/:username - Get profile by username
-router.get('/user/:username', async (req, res) => {
-  try {
-    const { username } = req.params;
-    
-    // Find user by username (case-insensitive)
-    const user = await User.findOne({ 
-      username: { $regex: new RegExp(`^${username}$`, 'i') } 
-    })
-    .select('-password -email -resetPasswordToken -resetPasswordExpires -stripeCustomerId -stripeSubscriptionId');
-    
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-    
-    res.json({
-      success: true,
-      profile: user
-    });
-    
-  } catch (error) {
-    console.error('Get profile by username error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to load profile'
     });
   }
 });
@@ -529,12 +516,12 @@ router.put('/notifications', verifyToken, async (req, res) => {
 });
 
 // POST /api/profile/photos - Upload photos
-router.post('/photos', uploadPhotos);
+router.post('/photos', verifyToken, uploadPhotos);
 
 // DELETE /api/profile/photos/:photoId - Delete a specific photo
-router.delete('/photos/:photoId', deletePhoto);
+router.delete('/photos/:photoId', verifyToken, deletePhoto);
 
 // PATCH /api/profile/photos/:photoId/display-mode - Update photo display mode
-router.patch('/photos/:photoId/display-mode', updatePhotoDisplayMode);
+router.patch('/photos/:photoId/display-mode', verifyToken, updatePhotoDisplayMode);
 
 export default router;
