@@ -31,6 +31,8 @@ import usersRoutes from './src/backend/routes/usersRoutes.js';
 import crushAccountRoutes from './src/backend/routes/crushAccountRoutes.js';
 import messageRoutes from './src/backend/routes/messageRoutes.js';
 import contactRoutes from './src/backend/routes/contactRoutes.js';
+import settingsRoutes from './src/backend/routes/settingsRoutes.js';
+
 
 // Import webhook handler
 import { handleStripeWebhook } from './src/backend/controllers/crushAccountController.js';
@@ -101,6 +103,7 @@ app.use('/api/users', usersRoutes);
 app.use('/api/crush-account', crushAccountRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
