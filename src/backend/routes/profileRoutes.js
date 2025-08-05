@@ -1,9 +1,11 @@
-// Updated Profile Routes with Notification Settings and Username Route
+// Updated Profile Routes with Cloudinary Integration
 // Path: src/backend/routes/profileRoutes.js
 // Purpose: Define profile-related API endpoints including notification preferences and username-based profile viewing
 
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import multer from 'multer';
+import cloudinary from '../config/cloudinary.js'; // Use your existing config
 import { 
   getProfile, 
   updateProfile, 
@@ -15,6 +17,51 @@ import {
 import User from '../models/User.js';
 
 const router = express.Router();
+
+// Configure multer for photo uploads
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit per file
+    files: 6 // Maximum 6 photos
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG and WebP are allowed.'));
+    }
+  }
+});
+
+// Helper function to upload to Cloudinary
+const uploadToCloudinary = (buffer, options = {}) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'gymcrush/profiles',
+        resource_type: 'image',
+        transformation: [
+          { width: 800, height: 800, crop: 'limit' }, // Limit max size
+          { quality: 'auto:good' }, // Auto optimize quality
+          { fetch_format: 'auto' } // Auto format (webp where supported)
+        ],
+        ...options
+      },
+      (error, result) => {
+        if (error) {
+          console.error('Cloudinary upload error:', error);
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+    uploadStream.end(buffer);
+  });
+};
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -41,6 +88,174 @@ router.get('/', getProfile);
 
 // PUT /api/profile - Update current user's profile
 router.put('/', updateProfile);
+
+// NEW: POST /api/profile/complete-onboarding - Complete user onboarding with Cloudinary
+router.post('/complete-onboarding', verifyToken, upload.array('photos', 6), async (req, res) => {
+  try {
+    const userId = req.userId;
+    
+    // Parse profile data if sent as FormData
+    let profileData;
+    if (req.body.profileData) {
+      try {
+        profileData = JSON.parse(req.body.profileData);
+      } catch (parseError) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid profile data format'
+        });
+      }
+    } else {
+      profileData = req.body;
+    }
+    
+    // Validate required fields
+    const requiredFields = ['gender', 'location', 'bio', 'interests', 'fitnessLevel', 'gymFrequency', 'lookingFor'];
+    const missingFields = requiredFields.filter(field => !profileData[field]);
+    
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing required fields: ${missingFields.join(', ')}`
+      });
+    }
+    
+    // Validate interests array
+    if (!Array.isArray(profileData.interests) || profileData.interests.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please select at least 3 interests'
+      });
+    }
+    
+    // Handle photo uploads to Cloudinary
+    let photoData = [];
+    if (req.files && req.files.length > 0) {
+      console.log(`Uploading ${req.files.length} photos to Cloudinary...`);
+      
+      try {
+        // Upload all photos to Cloudinary in parallel
+        const uploadPromises = req.files.map(async (file, index) => {
+          const result = await uploadToCloudinary(file.buffer, {
+            public_id: `user_${userId}_photo_${Date.now()}_${index}`,
+            tags: ['profile', `user_${userId}`]
+          });
+          
+          return {
+            url: result.secure_url,
+            publicId: result.public_id,
+            isMain: index === 0,
+            width: result.width,
+            height: result.height,
+            format: result.format
+          };
+        });
+        
+        photoData = await Promise.all(uploadPromises);
+        console.log(`Successfully uploaded ${photoData.length} photos to Cloudinary`);
+      } catch (uploadError) {
+        console.error('Error uploading photos to Cloudinary:', uploadError);
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to upload photos. Please try again.'
+        });
+      }
+    }
+    
+    // Prepare update data
+    const updateData = {
+      'profile.gender': profileData.gender,
+      'profile.height': profileData.height || '',
+      'profile.bodyType': profileData.bodyType || '',
+      'profile.location': profileData.location,
+      'profile.bio': profileData.bio,
+      'profile.interests': profileData.interests,
+      'profile.fitnessLevel': profileData.fitnessLevel,
+      'profile.gymFrequency': profileData.gymFrequency,
+      'profile.lookingFor': profileData.lookingFor,
+      'profile.prompts': profileData.prompts || [],
+      'filterPreferences': profileData.preferences || {
+        minAge: 18,
+        maxAge: 50,
+        distance: 25,
+        gender: ['Everyone']
+      },
+      'onboardingComplete': true,
+      'profileCompletedAt': new Date()
+    };
+    
+    // Add photos if uploaded
+    if (photoData.length > 0) {
+      updateData['profile.photos'] = photoData;
+    }
+    
+    // Update user profile
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateData },
+      { 
+        new: true, 
+        runValidators: true,
+        select: '-password -resetPasswordToken -resetPasswordExpires'
+      }
+    );
+    
+    if (!updatedUser) {
+      // If user not found and we uploaded photos, delete them from Cloudinary
+      if (photoData.length > 0) {
+        const deletePromises = photoData.map(photo => 
+          cloudinary.uploader.destroy(photo.publicId)
+        );
+        await Promise.all(deletePromises).catch(err => 
+          console.error('Error cleaning up Cloudinary photos:', err)
+        );
+      }
+      
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    // Return success response
+    res.status(200).json({
+      success: true,
+      message: 'Profile completed successfully',
+      user: {
+        id: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        onboardingComplete: true,
+        profile: updatedUser.profile,
+        crushBalance: updatedUser.crushBalance
+      }
+    });
+    
+  } catch (error) {
+    console.error('Complete onboarding error:', error);
+    
+    // Handle multer errors
+    if (error.message && error.message.includes('File too large')) {
+      return res.status(413).json({
+        success: false,
+        message: 'Photos are too large. Maximum size is 5MB per photo.'
+      });
+    }
+    
+    if (error.message && error.message.includes('Invalid file type')) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+    
+    res.status(500).json({
+      success: false,
+      message: 'Failed to complete profile setup',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
 
 // GET /api/profile/user/:username - Get profile by username
 router.get('/user/:username', async (req, res) => {
