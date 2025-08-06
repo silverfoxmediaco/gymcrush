@@ -158,11 +158,12 @@ export const verifyApplePurchase = [verifyToken, async (req, res) => {
     const verificationResponse = await verifyWithApple(receipt);
     
     if (verificationResponse.status === 0) {
-      // Valid receipt
+      // Valid receipt - Updated with correct product IDs and amounts
       const crushAmount = {
         'com.silverfoxmedia.gymcrush.5crushes': 5,
-        'com.silverfoxmedia.gymcrush.10crushes': 10,
-        'com.silverfoxmedia.gymcrush.25crushes': 25,
+        'com.silverfoxmedia.gymcrush.15crushes': 15,
+        'com.silverfoxmedia.gymcrush.30crushes': 30,
+        'com.silverfoxmedia.gymcrush.60crushes': 60
       }[productId] || 0;
       
       if (crushAmount === 0) {
@@ -265,11 +266,11 @@ export const verifyAppleSubscription = [verifyToken, async (req, res) => {
       const isActive = expiresDate > new Date();
       
       if (isActive) {
-        // Update user subscription
+        // Update user subscription - Fixed for unlimited_monthly subscription
         await User.findByIdAndUpdate(userId, {
           subscription: {
             status: 'active',
-            tier: productId.includes('monthly') ? 'monthly' : 'yearly',
+            tier: 'unlimited',
             currentPeriodEnd: expiresDate,
             appleTransactionId: transactionId,
             appleOriginalTransactionId: latestReceipt.original_transaction_id
@@ -286,7 +287,7 @@ export const verifyAppleSubscription = [verifyToken, async (req, res) => {
           platform: 'ios',
           transactionId: transactionId,
           productId: productId,
-          description: `Subscribed to ${productId.includes('monthly') ? 'monthly' : 'yearly'} unlimited`
+          description: 'Subscribed to unlimited membership'
         });
         
         res.json({
@@ -339,11 +340,12 @@ export const restorePurchases = [verifyToken, async (req, res) => {
         if (verificationResponse.status === 0) {
           // Process based on product type
           if (purchase.productId.includes('crushes')) {
-            // Restore crush pack
+            // Restore crush pack - Updated with correct amounts
             const crushAmount = {
               'com.silverfoxmedia.gymcrush.5crushes': 5,
-              'com.silverfoxmedia.gymcrush.10crushes': 10,
-              'com.silverfoxmedia.gymcrush.25crushes': 25,
+              'com.silverfoxmedia.gymcrush.15crushes': 15,
+              'com.silverfoxmedia.gymcrush.30crushes': 30,
+              'com.silverfoxmedia.gymcrush.60crushes': 60
             }[purchase.productId] || 0;
             
             if (crushAmount > 0) {
@@ -363,10 +365,37 @@ export const restorePurchases = [verifyToken, async (req, res) => {
               
               restoredCount++;
             }
-          } else if (purchase.productId.includes('monthly') || purchase.productId.includes('yearly')) {
-            // Restore subscription
-            // Handle subscription restoration
-            restoredCount++;
+          } else if (purchase.productId.includes('unlimited_monthly')) {
+            // Restore unlimited subscription
+            const latestReceiptInfo = verificationResponse.latest_receipt_info;
+            const latestReceipt = latestReceiptInfo[latestReceiptInfo.length - 1];
+            const expiresDate = new Date(parseInt(latestReceipt.expires_date_ms));
+            
+            if (expiresDate > new Date()) {
+              await User.findByIdAndUpdate(userId, {
+                subscription: {
+                  status: 'active',
+                  tier: 'unlimited',
+                  currentPeriodEnd: expiresDate,
+                  appleTransactionId: purchase.transactionId,
+                  appleOriginalTransactionId: latestReceipt.original_transaction_id
+                },
+                hasActiveSubscription: true,
+                subscriptionEndDate: expiresDate
+              });
+              
+              await CrushTransaction.create({
+                userId: userId,
+                type: 'restore',
+                amount: 0,
+                platform: 'ios',
+                transactionId: purchase.transactionId,
+                productId: purchase.productId,
+                description: 'Restored unlimited subscription'
+              });
+              
+              restoredCount++;
+            }
           }
         }
       }
@@ -381,6 +410,45 @@ export const restorePurchases = [verifyToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to restore purchases'
+    });
+  }
+}];
+
+// GET /api/crushes/balance - Get user's current crush balance and subscription status
+export const getCrushBalance = [verifyToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+    
+    const user = await User.findById(userId)
+      .select('crushBalance hasActiveSubscription subscriptionEndDate accountTier subscription');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    // Check if subscription is actually active
+    const hasActiveSubscription = user.hasActiveSubscription && 
+                                 user.subscriptionEndDate && 
+                                 user.subscriptionEndDate > new Date();
+    
+    res.json({
+      success: true,
+      crushBalance: user.crushBalance || 0,
+      hasActiveSubscription: hasActiveSubscription,
+      subscriptionEndDate: user.subscriptionEndDate,
+      accountTier: user.accountTier || 'free',
+      isUnlimited: hasActiveSubscription,
+      subscriptionStatus: user.subscription?.status || 'none'
+    });
+    
+  } catch (error) {
+    console.error('Get crush balance error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get crush balance'
     });
   }
 }];
