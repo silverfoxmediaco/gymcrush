@@ -7,6 +7,20 @@ import CrushTransaction from '../models/CrushTransaction.js';
 import jwt from 'jsonwebtoken';
 import notificationService from '../services/notificationService.js';
 
+// Helper to detect platform from request
+const getPlatform = (req) => {
+  const userAgent = req.headers['user-agent'] || '';
+  const clientPlatform = req.headers['x-client-platform'];
+  
+  // Check custom header first (more reliable)
+  if (clientPlatform) return clientPlatform;
+  
+  // Fallback to user-agent detection
+  if (userAgent.includes('iPhone') || userAgent.includes('iPad')) return 'ios';
+  if (userAgent.includes('Android')) return 'android';
+  return 'web';
+};
+
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -182,12 +196,17 @@ export const getBrowseProfiles = [verifyToken, async (req, res) => {
 
     console.log(`Returning ${formattedProfiles.length} profiles to client`);
 
+    // Check if user has active subscription
+    const hasActiveSubscription = currentUser.hasActiveSubscription && 
+                                 currentUser.subscriptionEndDate > new Date();
+
     res.json({
       success: true,
       profiles: formattedProfiles,
       accountTier: currentUser.accountTier,
       crushBalance: Math.max(0, currentUser.crushBalance || 0),
-      hasActiveSubscription: currentUser.subscription?.status === 'active'
+      hasActiveSubscription: hasActiveSubscription,
+      isUnlimited: hasActiveSubscription
     });
   } catch (error) {
     console.error('Browse profiles error:', error);
@@ -200,8 +219,9 @@ export const sendCrush = [verifyToken, async (req, res) => {
   try {
     const { recipientId } = req.body;
     const senderId = req.userId;
+    const platform = getPlatform(req);
 
-    console.log('Send crush request:', { senderId, recipientId });
+    console.log('Send crush request:', { senderId, recipientId, platform });
 
     // Get sender
     const sender = await User.findById(senderId);
@@ -213,8 +233,8 @@ export const sendCrush = [verifyToken, async (req, res) => {
     }
 
     // Check if user has crushes available or active subscription
-    const hasActiveSubscription = sender.subscription?.status === 'active' && 
-                                 sender.subscription?.currentPeriodEnd > new Date();
+    const hasActiveSubscription = sender.hasActiveSubscription && 
+                                 sender.subscriptionEndDate > new Date();
     
     const currentBalance = sender.crushBalance || 0;
     
@@ -225,7 +245,8 @@ export const sendCrush = [verifyToken, async (req, res) => {
         success: false,
         message: 'You need crushes to send. Please purchase more crushes or subscribe for unlimited!',
         needsCrushes: true,
-        balance: 0
+        needsPurchase: true,
+        crushBalance: 0
       });
     }
 
@@ -261,7 +282,8 @@ export const sendCrush = [verifyToken, async (req, res) => {
         'crushes.sent': {
           to: recipientId,
           sentAt: new Date()
-        }
+        },
+        'crushesSent': recipientId  // Also update the simplified array
       }
     };
 
@@ -282,22 +304,32 @@ export const sendCrush = [verifyToken, async (req, res) => {
         'crushes.received': {
           from: senderId,
           receivedAt: new Date()
-        }
+        },
+        'crushesReceived': senderId  // Also update the simplified array
       }
     });
+
+    // If it's a match, update both users' matches arrays
+    if (recipientSentToSender) {
+      await User.findByIdAndUpdate(senderId, {
+        $addToSet: { matches: recipientId }
+      });
+      await User.findByIdAndUpdate(recipientId, {
+        $addToSet: { matches: senderId }
+      });
+    }
 
     // Create transaction record
     try {
       await CrushTransaction.create({
         userId: senderId,
-        type: 'sent',
-        action: 'sent',
-        amount: 1,
-        change: -1,
-        balanceAfter: hasActiveSubscription ? 999999 : Math.max(0, updatedSender.crushBalance),
+        type: 'use',
+        amount: -1,
+        balance: hasActiveSubscription ? 999999 : Math.max(0, updatedSender.crushBalance),
+        platform: platform,
         recipientId: recipientId,
-        recipientName: recipient.username,
-        description: `Sent crush to ${recipient.username}`
+        description: `Sent crush to ${recipient.username}`,
+        status: 'completed'
       });
     } catch (txError) {
       console.error('Transaction creation error:', txError);
@@ -322,7 +354,8 @@ export const sendCrush = [verifyToken, async (req, res) => {
       success: true,
       message: recipientSentToSender ? 'It\'s a match! 💪🔥' : 'Crush sent successfully!',
       isMatch: recipientSentToSender,
-      remainingCrushes: hasActiveSubscription ? 'unlimited' : Math.max(0, updatedSender.crushBalance)
+      remainingCrushes: hasActiveSubscription ? 'unlimited' : Math.max(0, updatedSender.crushBalance),
+      crushBalance: hasActiveSubscription ? 999999 : Math.max(0, updatedSender.crushBalance)
     });
 
   } catch (error) {

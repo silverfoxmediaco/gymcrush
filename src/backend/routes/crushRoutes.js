@@ -6,6 +6,7 @@ import express from 'express';
 import { 
   getCrushes, 
   getCrushData,
+  getCrushBalance,
   verifyApplePurchase,
   verifyAppleSubscription,
   restorePurchases
@@ -24,6 +25,7 @@ router.get('/data', getCrushData);
 router.post('/verify-apple-purchase', verifyApplePurchase);
 router.post('/verify-apple-subscription', verifyAppleSubscription);
 router.post('/restore-purchases', restorePurchases);
+router.get('/balance', getCrushBalance);
 
 // Payment and subscription routes (Stripe)
 router.post('/create-checkout', crushAccountController.createCheckoutSession);
