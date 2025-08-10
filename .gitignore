@@ -65,3 +65,5 @@ Thumbs.db
 # Stripe
 .stripe/
 
+src/backend/config/*.json
+ny-boulevard-towers-*.json
