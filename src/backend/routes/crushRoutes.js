@@ -9,6 +9,10 @@ import {
   getCrushBalance,
   verifyApplePurchase,
   verifyAppleSubscription,
+  verifyAndroidPurchase,
+  verifyAndroidSubscription,
+  verifyPurchase,
+  verifySubscription,
   restorePurchases
 } from '../controllers/crushController.js';
 import * as crushAccountController from '../controllers/crushAccountController.js';
@@ -21,13 +25,26 @@ router.get('/', getCrushes);
 // GET /api/crushes/data - Get crush balance and history
 router.get('/data', getCrushData);
 
+// ============ GENERIC IAP ROUTES (iOS & Android) ============
+// These routes automatically detect platform and route to correct handler
+router.post('/verify-purchase', verifyPurchase);
+router.post('/verify-subscription', verifySubscription);
+router.post('/restore-purchases', restorePurchases);
+
+// ============ PLATFORM-SPECIFIC ROUTES (kept for backward compatibility) ============
 // Apple In-App Purchase routes
 router.post('/verify-apple-purchase', verifyApplePurchase);
 router.post('/verify-apple-subscription', verifyAppleSubscription);
-router.post('/restore-purchases', restorePurchases);
+
+// Android In-App Purchase routes
+router.post('/verify-android-purchase', verifyAndroidPurchase);
+router.post('/verify-android-subscription', verifyAndroidSubscription);
+
+// Balance check
 router.get('/balance', getCrushBalance);
 
-// Payment and subscription routes (Stripe)
+// ============ WEB PAYMENT ROUTES (Stripe) ============
+// Payment and subscription routes (Stripe - for web only)
 router.post('/create-checkout', crushAccountController.createCheckoutSession);
 router.post('/create-subscription', crushAccountController.createSubscription);
 router.post('/cancel-subscription', crushAccountController.cancelSubscription);

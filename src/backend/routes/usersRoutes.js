@@ -7,8 +7,12 @@ import {
   getUserProfile,
   getUserActivity,
   getFilterPreferences,
-  updateFilterPreferences
+  updateFilterPreferences,
+  blockUser,
+  unblockUser,
+  getBlockedUsers
 } from '../controllers/usersController.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -20,6 +24,16 @@ router.get('/filter-preferences', getFilterPreferences);
 
 // PUT /api/users/filter-preferences - Update user's filter preferences
 router.put('/filter-preferences', updateFilterPreferences);
+
+// Block/Unblock endpoints (require authentication)
+// POST /api/users/:userId/block - Block a user
+router.post('/:userId/block', verifyToken, blockUser);
+
+// DELETE /api/users/:userId/block - Unblock a user
+router.delete('/:userId/block', verifyToken, unblockUser);
+
+// GET /api/users/blocked - Get list of blocked users
+router.get('/blocked', verifyToken, getBlockedUsers);
 
 // GET /api/users/:userId - Get a specific user's profile
 // Note: This must be last because :userId is a catch-all parameter
