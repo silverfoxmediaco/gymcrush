@@ -20,10 +20,18 @@ export const getUserProfile = async (req, res) => {
     }
     
     // Check if current user has sent a crush to this user
-    const currentUser = await User.findById(req.userId);
-    const crushSent = currentUser.crushes.sent.some(
-      crush => crush.to.toString() === userId
-    );
+    let crushSent = false;
+    try {
+      const currentUser = await User.findById(req.userId);
+      if (currentUser && currentUser.crushes && currentUser.crushes.sent) {
+        crushSent = currentUser.crushes.sent.some(
+          crush => crush.to && crush.to.toString() === userId
+        );
+      }
+    } catch (crushError) {
+      console.log('Error checking crush status:', crushError);
+      // Continue without crush status - not critical
+    }
     
     res.json({
       success: true,
