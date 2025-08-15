@@ -11,13 +11,6 @@ const OnboardingFlow = () => {
 
   const screens = [
     {
-      id: 'welcome',
-      type: 'welcome',
-      title: 'Ready to Find Your GymCrush?',
-      subtitle: 'Join thousands of fitness enthusiasts finding love and workout partners',
-      showButtons: true
-    },
-    {
       id: 'branding',
       type: 'branding',
       logo: true,
@@ -47,19 +40,26 @@ const OnboardingFlow = () => {
         }
       ],
       showSkip: true
+    },
+    {
+      id: 'welcome',
+      type: 'welcome',
+      title: 'Ready to Find Your GymCrush?',
+      subtitle: 'Join thousands of fitness enthusiasts finding love and workout partners',
+      showButtons: true
     }
   ];
 
   const handleCreateAccount = () => {
     localStorage.setItem('onboardingComplete', 'true');
-    // Open signup modal or navigate to signup
-    navigate('/?signup=true');
+    // Navigate to homepage with signup parameter
+    window.location.href = '/?signup=true';
   };
 
   const handleLogin = () => {
     localStorage.setItem('onboardingComplete', 'true');
-    // Open login modal or navigate to login
-    navigate('/?login=true');
+    // Navigate to homepage with login parameter
+    window.location.href = '/?login=true';
   };
 
   const handleSkip = () => {
@@ -141,7 +141,7 @@ const OnboardingFlow = () => {
             )}
             <div className="logo-container">
               <img 
-                src="/src/frontend/assets/images/gymcrushlogotrans300.png" 
+                src="/assets/images/gymcrushlogotrans300.png" 
                 alt="GymCrush Logo" 
                 className="logo"
               />
