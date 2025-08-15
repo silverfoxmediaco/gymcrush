@@ -77,6 +77,17 @@ function AppContent() {
   // Check if we're on the browse page
   const isBrowsePage = location.pathname === '/browse';
 
+  // PWA Service Worker Registration
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('Service Worker registered:', reg))
+          .catch(err => console.log('Service Worker registration failed:', err));
+      });
+    }
+  }, []);
+
   useEffect(() => {
     // Check if user is logged in
     const token = localStorage.getItem('token');

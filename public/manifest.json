@@ -1,28 +1,21 @@
 {
-  "name": "GymCrush - Where Strength Meets Chemistry",
+  "name": "GymCrush",
   "short_name": "GymCrush",
-  "description": "The hottest fitness dating app - Connect with fitness enthusiasts who share your passion for health and wellness",
+  "description": "Where Fitness Singles Connect",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "theme_color": "#FF3B30",
-  "background_color": "#FFFFFF",
-  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
   "icons": [
     {
-      "src": "/favicon.png",
-      "sizes": "64x64",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/images/gymcrushlogo2.png",
+      "src": "/src/frontend/assets/images/gymcrushtran192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/assets/images/gymcrushlogo2.png",
+      "src": "/src/frontend/assets/images/gymcrushlogotrans300.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
