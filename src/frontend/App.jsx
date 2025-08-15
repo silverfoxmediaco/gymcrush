@@ -3,7 +3,7 @@
 // Purpose: Main application component with routing
 
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -20,6 +20,7 @@ import Contact from './components/Contact';
 import ResetPassword from './components/ResetPassword';
 import HelpCenter from './pages/HelpCenter';
 import Settings from './pages/Settings';
+import OnboardingFlow from './components/onboarding/OnboardingFlow';
 
 // Import new pages
 import TermsOfService from './pages/TermsOfService';
@@ -70,9 +71,11 @@ const LandingPage = ({ onSignupClick }) => (
 // Main App content that needs access to useLocation
 function AppContent() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Check if we're on the browse page
   const isBrowsePage = location.pathname === '/browse';
@@ -88,15 +91,39 @@ function AppContent() {
     }
   }, []);
 
+  // Check for onboarding and authentication
   useEffect(() => {
-    // Check if user is logged in
     const token = localStorage.getItem('token');
+    const hasCompletedOnboarding = localStorage.getItem('onboardingComplete');
+    const isReturningUser = localStorage.getItem('returningUser');
+    
     setIsLoggedIn(!!token);
-  }, []);
+    
+    // Show onboarding for first-time visitors (not logged in, haven't seen onboarding, not returning)
+    if (!hasCompletedOnboarding && !isReturningUser && !token) {
+      setShowOnboarding(true);
+    }
+
+    // Check URL params for signup/login triggers from onboarding
+    const params = new URLSearchParams(location.search);
+    if (params.get('signup') === 'true') {
+      setShowSignupModal(true);
+      setShowOnboarding(false);
+      localStorage.setItem('onboardingComplete', 'true');
+      navigate('/', { replace: true });
+    }
+    if (params.get('login') === 'true') {
+      setShowLoginModal(true);
+      setShowOnboarding(false);
+      localStorage.setItem('onboardingComplete', 'true');
+      navigate('/', { replace: true });
+    }
+  }, [location, navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.setItem('returningUser', 'true'); // Mark as returning user
     setIsLoggedIn(false);
     window.location.href = '/';
   };
@@ -113,11 +140,34 @@ function AppContent() {
     setShowLoginModal(true);
   };
 
+  // Handle signup button click
+  const handleSignupClick = () => {
+    if (showOnboarding) {
+      setShowOnboarding(false);
+      localStorage.setItem('onboardingComplete', 'true');
+    }
+    setShowSignupModal(true);
+  };
+
+  // Handle login button click
+  const handleLoginClick = () => {
+    if (showOnboarding) {
+      setShowOnboarding(false);
+      localStorage.setItem('onboardingComplete', 'true');
+    }
+    setShowLoginModal(true);
+  };
+
+  // Show onboarding flow if needed
+  if (showOnboarding) {
+    return <OnboardingFlow />;
+  }
+
   return (
     <div className="App">
       <Header 
-        onSignupClick={() => setShowSignupModal(true)}
-        onLoginClick={() => setShowLoginModal(true)}
+        onSignupClick={handleSignupClick}
+        onLoginClick={handleLoginClick}
         isLoggedIn={isLoggedIn}
         onLogout={handleLogout}
       />
@@ -125,7 +175,7 @@ function AppContent() {
       <main className="main-content">
         <Routes>
           <Route path="/" element={
-            <LandingPage onSignupClick={() => setShowSignupModal(true)} />
+            <LandingPage onSignupClick={handleSignupClick} />
           } />
           
           <Route path="/profile" element={
