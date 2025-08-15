@@ -1,8 +1,7 @@
-const CACHE_NAME = 'gymcrush-v1';
+const CACHE_NAME = 'gymcrush-v2'; // Increment version when updating
 const urlsToCache = [
   '/',
-  '/index.html',
-  '/src/frontend/assets/images/gymcrushtran192.png'
+  '/index.html'
 ];
 
 self.addEventListener('install', event => {
@@ -29,10 +28,23 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Skip caching for assets with hash in filename
+  if (event.request.url.includes('/assets/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then(response => {
+        // Always fetch fresh HTML
+        if (event.request.url.endsWith('.html') || event.request.url.endsWith('/')) {
+          return fetch(event.request);
+        }
         return response || fetch(event.request);
+      })
+      .catch(() => {
+        return fetch(event.request);
       })
   );
 });
