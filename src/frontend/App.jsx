@@ -21,6 +21,7 @@ import ResetPassword from './components/ResetPassword';
 import HelpCenter from './pages/HelpCenter';
 import Settings from './pages/Settings';
 import OnboardingFlow from './components/onboarding/OnboardingFlow';
+import InstallBanner from './components/InstallBanner';
 
 // Import new pages
 import TermsOfService from './pages/TermsOfService';
@@ -255,6 +256,9 @@ function AppContent() {
       
       {/* Conditionally render Footer - hide on browse page */}
       {!isBrowsePage && <Footer />}
+      
+      {/* Install Banner for mobile users */}
+      <InstallBanner />
       
       <SignupModal 
         isOpen={showSignupModal} 
